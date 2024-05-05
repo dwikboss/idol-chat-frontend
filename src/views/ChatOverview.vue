@@ -1,5 +1,5 @@
 <template>
-  <div class="page home">
+  <div class="page overview">
     <div class="overview-header">
       <div class="full-width">
         <h2>Messages</h2>
@@ -38,7 +38,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.page.home {
+.page.overview {
   background: rgb(255, 174, 245);
   background: linear-gradient(330deg, rgba(255, 174, 245, 1) 0%, rgba(0, 255, 248, 0.26094187675070024) 100%);
   height: 100vh;

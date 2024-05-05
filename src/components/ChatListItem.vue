@@ -1,5 +1,5 @@
 <template>
-   <div class="chat-list-item">
+   <div class="chat-list-item" @click="openChat">
     <img :src="`/images/profile_pictures/${profilePicture}`" alt="Profile Picture" />
     <p>{{ displayName }}</p>
   </div>
@@ -19,6 +19,11 @@ export default defineComponent({
     profilePicture: {
       type: String,
       required: true
+    }
+  },
+  methods: {
+    openChat() {
+      this.$router.push({ name: 'Chat', params: { idolName: this.name } });
     }
   }
 });
