@@ -9,17 +9,12 @@
         </div>
       </div>
     </div>
-    <div class="chat-container">
-      <div class="full-width">
-        <div class="chat-area">
-          <ChatMessage/>
-        </div>
-      </div>
+    <div class="chat-container full-width">
+        <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" />
     </div>
     <div class="input-area">
       <div class="full-width">
         <input @keyup.enter="sendChat" placeholder="Type your message here..." type="text" v-model="input" />
-        <button>></button>
       </div>
     </div>
   </div>
@@ -48,10 +43,21 @@ export default defineComponent({
     this.fetchIdolData();
     this.loadChatHistory();
   },
+  updated() {
+    this.$nextTick(() => this.scrollToEnd());
+  },
   components: {
     ChatMessage
   },
   methods: {
+    scrollToEnd() {
+      this.$nextTick(() => {
+        const chatArea = this.$el.querySelector('.chat-container');
+        if (chatArea) {
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }
+      });
+    },
     loadChatHistory() {
       const history = localStorage.getItem('chatHistory');
       if (history) {
@@ -72,6 +78,7 @@ export default defineComponent({
         const newUserMessage = { role: 'user', content: this.input };
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
+        console.log(this.chatMessages);
         localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
         this.input = '';
 
@@ -83,7 +90,8 @@ export default defineComponent({
           const minjiReply = response.data.reply.choices[0].message.content;
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
-          console.log(minjiReply);
+          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply)});
+          console.log(this.chatMessages);
         } catch (error) {
           console.error('Error sending chat:', error);
         }
@@ -134,17 +142,19 @@ export default defineComponent({
   }
 
   .chat-container {
+    display: flex;
     flex-grow: 1;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    width: 100%;
+    gap: 20px;
+    flex-direction: column;
+    height: 0;
+    overflow: scroll;
+    justify-content: flex-start;
 
-    .full-width {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-
-      .chat-area {
-        flex-grow: 1;
-      }
+    & > :first-child { 
+      margin-top: auto 
     }
   }
 

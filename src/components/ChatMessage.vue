@@ -1,27 +1,48 @@
 <template>
-  <div :class="messageClass">
-    <div class="message-wrapper">
-      <!-- <p>{{ chat.message }}</p> -->
-    </div>
+  <div class="message-bubble" :class="chat.role">
+    <p>{{ formatMessage }}</p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-// import type { Message } from '../interfaces/_IMessage';
 
 export default defineComponent({
   name: 'ChatMessage',
   props: {
-    // chat: {
-    //   type: Object as () => Message,
-    //   required: true,
-    // },
+    chat: {
+      type: Object as () => any,
+      required: true,
+    },
   },
   computed: {
-    messageClass(): string {
-      return this.chat.user ? 'chat-message user' : 'chat-message assistant';
-    },
+    formatMessage() {
+      if (this.chat.role == 'assistant') {
+        return this.chat.content.Korean;
+      } else {
+        return this.chat.content
+      }
+    }
   },
 });
 </script>
+<style lang="scss" scoped>
+.message-bubble {
+  background-color: rgb(179, 34, 123);
+  padding: 10px;
+  color: white;
+  font-family: 'Roboto';
+  
+
+  &.user {
+    border-radius: 10px 10px 0 10px;
+    margin-left: auto;
+    max-width: 75%;
+  }
+  &.assistant {
+    border-radius: 10px 10px 10px 0px;
+    max-width: 75%;
+    margin-right: auto;
+  }
+}
+</style>
