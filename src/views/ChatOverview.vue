@@ -39,8 +39,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .page.overview {
-  background: rgb(255, 174, 245);
-  background: linear-gradient(330deg, rgba(255, 174, 245, 1) 0%, rgba(0, 255, 248, 0.26094187675070024) 100%);
+  background-color: #fff2fc;
   height: 100vh;
 
   .overview-header {
