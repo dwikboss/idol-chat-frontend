@@ -84,7 +84,7 @@ export default defineComponent({
         this.input = '';
 
         try {
-          const response = await axios.post('http://localhost:3000/message', {
+          const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
             chatHistory: this.chatHistory,
           });
 
