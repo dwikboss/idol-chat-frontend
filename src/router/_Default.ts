@@ -7,11 +7,6 @@ import Chat from '../views/Chat.vue';
 const routes = [
   {
     path: '/',
-    name: PageName.HOME,
-    component: Home,
-  },
-  {
-    path: '/ChatOverview',
     name: PageName.CHATOVERVIEW,
     component: ChatOverview,
   },
