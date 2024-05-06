@@ -8,9 +8,9 @@
     <div class="full-width">
       <div class="chat-list">
         <ChatListItem
-          v-for="(idol, name) in idols"
-          :key="name"
-          :name="name"
+          v-for="idol in idols"
+          :key="idol.id"
+          :name="idol.id"
           :display-name="idol.display_name"
           :profile-picture="idol.profile_picture"
         />
