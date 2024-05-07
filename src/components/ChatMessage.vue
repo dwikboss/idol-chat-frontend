@@ -55,7 +55,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .bubble-wrapper {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 
   &.user {
     .translate-btn {
@@ -68,7 +68,6 @@ export default defineComponent({
       color: white;
       font-family: 'Roboto';
       font-weight: 600;
-      margin-left: 10px;
       font-size: 16px;
       display: flex;
       justify-content: center;

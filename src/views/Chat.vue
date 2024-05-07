@@ -51,7 +51,7 @@ export default defineComponent({
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
-    this.startBotInitiationTimer();
+    // this.startBotInitiationTimer();
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -70,7 +70,6 @@ export default defineComponent({
         this.initBotConversation();
         setTimeout(initiateConversation, delay);
       };
-      initiateConversation();
     },
     initBotConversation() {
       if (this.usedMessages.size < this.randomMessages.length) {
