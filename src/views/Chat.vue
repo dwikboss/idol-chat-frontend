@@ -5,12 +5,13 @@
         <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>{{ idolData.display_name }}</h4>
-          <p>Online</p>
+          <p v-if="loading">Typing...</p>
+          <p v-else>Online</p>
         </div>
       </div>
     </div>
     <div class="chat-container full-width">
-        <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" />
+      <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" />
     </div>
     <div class="input-area">
       <div class="full-width">
@@ -37,6 +38,7 @@ export default defineComponent({
       chatHistory: [] as any,
       chatMessages: [] as Message[],
       input: '',
+      loading: false as boolean
     };
   },
   mounted() {
@@ -47,7 +49,7 @@ export default defineComponent({
     this.$nextTick(() => this.scrollToEnd());
   },
   components: {
-    ChatMessage
+    ChatMessage,
   },
   methods: {
     scrollToEnd() {
@@ -61,17 +63,27 @@ export default defineComponent({
     loadChatHistory() {
       const history = localStorage.getItem('chatHistory');
       if (history) {
-        this.chatHistory = JSON.parse(history);
-        console.log(this.chatHistory);
+        let parsedHistory = JSON.parse(history);
+        this.chatMessages = parsedHistory.map((message: any) => {
+          if (message.role === 'assistant' && typeof message.content === 'string') {
+            try {
+              message.content = JSON.parse(message.content);
+            } catch (e) {
+              console.error('Failed to parse message content', e);
+            }
+          }
+          return message;
+        });
+        console.log(this.chatMessages);
       }
     },
     fetchIdolData() {
       const idolName = this.$route.params.idolName as string;
-      const idol = idols.find(idol => idol.id === idolName);
+      const idol = idols.find((idol) => idol.id === idolName);
       if (idol) {
-          this.idolData = idol;
+        this.idolData = idol;
       } else {
-          this.idolData = { id: 'unknown', display_name: 'Unknown', profile_picture: 'default.jpg' };
+        this.idolData = { id: 'unknown', display_name: 'Unknown', profile_picture: 'default.jpg' };
       }
     },
     async sendChat() {
@@ -83,6 +95,7 @@ export default defineComponent({
         localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
         this.input = '';
 
+        this.loading = true;
         try {
           const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
             chatHistory: this.chatHistory,
@@ -91,8 +104,9 @@ export default defineComponent({
           const minjiReply = response.data.reply.choices[0].message.content;
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
-          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply)});
+          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
           console.log(this.chatMessages);
+          this.loading = false;
         } catch (error) {
           console.error('Error sending chat:', error);
         }
@@ -154,8 +168,8 @@ export default defineComponent({
     overflow: scroll;
     justify-content: flex-start;
 
-    & > :first-child { 
-      margin-top: auto 
+    & > :first-child {
+      margin-top: auto;
     }
   }
 

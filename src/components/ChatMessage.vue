@@ -1,6 +1,9 @@
 <template>
-  <div class="message-bubble" :class="chat.role">
-    <p>{{ formatMessage }}</p>
+  <div class="bubble-wrapper" :class="chat.role">
+    <div class="message-bubble" :class="chat.role">
+      <p>{{ formatMessage }}</p>
+    </div>
+    <div @click="translate" class="translate-btn">A</div>
   </div>
 </template>
 
@@ -9,6 +12,11 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: 'ChatMessage',
+  data() {
+    return {
+      translated: false as boolean,
+    }
+  },
   props: {
     chat: {
       type: Object as () => any,
@@ -18,31 +26,68 @@ export default defineComponent({
   computed: {
     formatMessage() {
       if (this.chat.role == 'assistant') {
-        return this.chat.content.Korean;
+        if (this.translated) {
+          return this.chat.content.Korean;
+        } else {
+          return this.chat.content.English;
+        }
       } else {
-        return this.chat.content
+        return this.chat.content;
       }
-    }
+    },
   },
+  methods: {
+    translate() {
+      this.translated = !this.translated;
+    }
+  }
 });
 </script>
+
 <style lang="scss" scoped>
-.message-bubble {
-  background-color: rgb(179, 34, 123);
-  padding: 10px;
-  color: white;
-  font-family: 'Roboto';
-  
+.bubble-wrapper {
+  display: flex;
+  align-items: center;
 
   &.user {
-    border-radius: 10px 10px 0 10px;
-    margin-left: auto;
-    max-width: 75%;
+    .translate-btn {
+      display: none;
+    }
   }
+
   &.assistant {
-    border-radius: 10px 10px 10px 0px;
-    max-width: 75%;
-    margin-right: auto;
+    .translate-btn {
+      background-color: rgba(93, 144, 221, 0.582);
+      color: white;
+      font-family: 'Roboto';
+      font-weight: 600;
+      margin-left: 10px;
+      font-size: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+    }
+  }
+
+  .message-bubble {
+    background-color: rgb(179, 34, 123);
+    padding: 10px;
+    color: white;
+    font-family: 'Roboto';
+
+    &.user {
+      border-radius: 10px 10px 0 10px;
+      margin-left: auto;
+      max-width: 75%;
+    }
+
+    &.assistant {
+      border-radius: 10px 10px 10px 0px;
+    }
   }
 }
 </style>
