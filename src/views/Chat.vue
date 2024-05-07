@@ -37,15 +37,10 @@ export default defineComponent({
       idolData: {} as Idol,
       chatHistory: [] as any,
       chatMessages: [] as Message[],
-      randomMessages: [
-        'Can you act like youre gonna get something real quick. be creative, dont copy my example!',
-        'Can you act like youre gonna say hi to one of the members real quick becuase they just returned from doing something. switch it up! be creative, dont copy my example!',
-        'Can you act like youre super bored? Ask the user something like what theyre gonna do soon. use "btw" or something similar. switch it up! be creative, dont copy my example!',
-        'Can you ask for my opinion on a random thing about something youre talking about with the members? use "oh btw" or something similar. switch it up! be creative, dont copy my example!',
-      ] as string[],
       input: '',
       loading: false as boolean,
       sendChatCount: 0,
+      userSentLast: false,
     };
   },
   mounted() {
@@ -59,32 +54,11 @@ export default defineComponent({
     ChatMessage,
   },
   methods: {
-    // startBotInitiationTimer() {
-    //   const initiateConversation = () => {
-    //     if (this.usedMessages.size >= this.randomMessages.length) {
-    //       console.log('All random messages have been used. Stopping further messages.');
-    //       return;
-    //     }
-    //     const delay = Math.random() * (8 * 60000 - 3 * 60000) + 1 * 60000;
-    //     this.initBotConversation();
-    //     setTimeout(initiateConversation, delay);
-    //   };
-    // },
-    // initBotConversation() {
-    //   if (this.usedMessages.size < this.randomMessages.length) {
-    //     let randomIndex;
-
-    //     do {
-    //       randomIndex = Math.floor(Math.random() * this.randomMessages.length);
-    //     } while (this.usedMessages.has(randomIndex));
-
-    //     this.usedMessages.add(randomIndex);
-    //     const randomMessage = this.randomMessages[randomIndex];
-    //     this.sendChat(randomMessage);
-    //   } else {
-    //     console.log('All messages have been used.');
-    //   }
-    // },
+    initBotConversation() {
+      this.sendChat(
+        '-1-Can you talk about what you just said a bit more? Continue that part of the conversation in no more than 4 words. You can also react a bit more on what you just said.'
+      );
+    },
     scrollToEnd() {
       this.$nextTick(() => {
         const chatArea = this.$el.querySelector('.chat-container');
@@ -126,20 +100,21 @@ export default defineComponent({
     },
     async sendChat(customContent: string) {
       if (this.input.trim() !== '') {
+        this.userSentLast = true;
         const newUserMessage = { role: 'user', content: this.input };
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
-
         this.input = '';
       } else {
         if (customContent.trim() !== '') {
+          this.userSentLast = false;
           const newUserMessage = { role: 'user', content: customContent };
           this.chatHistory.push(newUserMessage);
         }
       }
 
       this.loading = true;
-      // https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message
+
       try {
         const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
           chatHistory: this.chatHistory,
@@ -149,6 +124,14 @@ export default defineComponent({
         this.chatHistory.push({ role: 'assistant', content: minjiReply });
         this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
         localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+
+        if (this.userSentLast) {
+          if (Math.random() < 0.15) {
+            console.log('Triggering additional bot conversation');
+            this.initBotConversation();
+          }
+        }
+
         this.loading = false;
       } catch (error) {
         console.error('Error sending chat:', error);
