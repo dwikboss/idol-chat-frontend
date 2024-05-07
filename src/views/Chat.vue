@@ -66,7 +66,7 @@ export default defineComponent({
           console.log('All random messages have been used. Stopping further messages.');
           return;
         }
-        const delay = Math.random() * (5 * 60000 - 1 * 60000) + 1 * 60000;
+        const delay = Math.random() * (8 * 60000 - 3 * 60000) + 1 * 60000;
         this.initBotConversation();
         setTimeout(initiateConversation, delay);
       };
