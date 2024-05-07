@@ -38,20 +38,19 @@ export default defineComponent({
       chatHistory: [] as any,
       chatMessages: [] as Message[],
       randomMessages: [
-        '-1-Can you act like youre gonna get something real quick. be creative, dont copy my example!',
-        '-1-Can you act like youre gonna say hi to one of the members real quick becuase they just returned from doing something. switch it up! be creative, dont copy my example!',
-        '-1-Can you act like youre super bored? Ask the user something like what theyre gonna do soon. use "btw" or something similar. switch it up! be creative, dont copy my example!',
-        '-1-Can you ask for my opinion on a random thing about something youre talking about with the members? use "oh btw" or something similar. switch it up! be creative, dont copy my example!',
-      ] as any,
+        'Can you act like youre gonna get something real quick. be creative, dont copy my example!',
+        'Can you act like youre gonna say hi to one of the members real quick becuase they just returned from doing something. switch it up! be creative, dont copy my example!',
+        'Can you act like youre super bored? Ask the user something like what theyre gonna do soon. use "btw" or something similar. switch it up! be creative, dont copy my example!',
+        'Can you ask for my opinion on a random thing about something youre talking about with the members? use "oh btw" or something similar. switch it up! be creative, dont copy my example!',
+      ] as string[],
       input: '',
-      usedMessages: new Set(),
       loading: false as boolean,
+      sendChatCount: 0,
     };
   },
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
-    // this.startBotInitiationTimer();
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -60,32 +59,32 @@ export default defineComponent({
     ChatMessage,
   },
   methods: {
-    startBotInitiationTimer() {
-      const initiateConversation = () => {
-        if (this.usedMessages.size >= this.randomMessages.length) {
-          console.log('All random messages have been used. Stopping further messages.');
-          return;
-        }
-        const delay = Math.random() * (8 * 60000 - 3 * 60000) + 1 * 60000;
-        this.initBotConversation();
-        setTimeout(initiateConversation, delay);
-      };
-    },
-    initBotConversation() {
-      if (this.usedMessages.size < this.randomMessages.length) {
-        let randomIndex;
+    // startBotInitiationTimer() {
+    //   const initiateConversation = () => {
+    //     if (this.usedMessages.size >= this.randomMessages.length) {
+    //       console.log('All random messages have been used. Stopping further messages.');
+    //       return;
+    //     }
+    //     const delay = Math.random() * (8 * 60000 - 3 * 60000) + 1 * 60000;
+    //     this.initBotConversation();
+    //     setTimeout(initiateConversation, delay);
+    //   };
+    // },
+    // initBotConversation() {
+    //   if (this.usedMessages.size < this.randomMessages.length) {
+    //     let randomIndex;
 
-        do {
-          randomIndex = Math.floor(Math.random() * this.randomMessages.length);
-        } while (this.usedMessages.has(randomIndex));
+    //     do {
+    //       randomIndex = Math.floor(Math.random() * this.randomMessages.length);
+    //     } while (this.usedMessages.has(randomIndex));
 
-        this.usedMessages.add(randomIndex);
-        const randomMessage = this.randomMessages[randomIndex];
-        this.sendChat(randomMessage);
-      } else {
-        console.log('All messages have been used.');
-      }
-    },
+    //     this.usedMessages.add(randomIndex);
+    //     const randomMessage = this.randomMessages[randomIndex];
+    //     this.sendChat(randomMessage);
+    //   } else {
+    //     console.log('All messages have been used.');
+    //   }
+    // },
     scrollToEnd() {
       this.$nextTick(() => {
         const chatArea = this.$el.querySelector('.chat-container');
