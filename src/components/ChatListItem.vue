@@ -1,7 +1,10 @@
 <template>
-   <div class="chat-list-item" @click="openChat">
+  <div class="chat-list-item" @click="openChat">
     <img :src="`/images/profile_pictures/${profilePicture}`" alt="Profile Picture" />
-    <p>{{ displayName }}</p>
+    <div class="name">
+      <p>{{ displayName }}</p>
+      <p>{{ realName }}</p>
+    </div>
   </div>
 </template>
 
@@ -14,18 +17,22 @@ export default defineComponent({
     name: String,
     displayName: {
       type: String,
-      required: true
+      required: true,
     },
     profilePicture: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
+    realName: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     openChat() {
       this.$router.push({ name: 'Chat', params: { idolName: this.name } });
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -40,18 +47,28 @@ export default defineComponent({
   border-radius: 15px;
   border: 1px solid black;
 
-  p {
-    font-family: 'Roboto';
-    font-weight: 700;
-    font-size: 20px;
+  .name {
+    p {
+      font-family: 'Roboto';
+      font-weight: 700;
+      font-size: 20px;
+
+      &:nth-of-type(2) {
+        font-size: 14px;
+        font-weight: 300;
+        color: rgb(126, 126, 126);
+      }
+    }
   }
 
   img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    border: 2px solid #a7e765;
   }
 }
+
 h1 {
   color: black;
 }
