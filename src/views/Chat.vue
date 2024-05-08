@@ -15,7 +15,7 @@
     </div>
     <div class="input-area">
       <div class="full-width">
-        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input" />
+        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input" ref="inputField" />
       </div>
     </div>
   </div>
@@ -105,6 +105,8 @@ export default defineComponent({
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
         this.input = '';
+        const inputElement = this.$refs.inputField as HTMLInputElement;
+        inputElement.blur();
       } else {
         if (customContent.trim() !== '') {
           this.userSentLast = false;
@@ -157,6 +159,7 @@ export default defineComponent({
     position: fixed;
     width: 100%;
     top: 0;
+    z-index: 999;
 
     .full-width {
       width: 100%;
