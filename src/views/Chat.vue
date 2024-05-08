@@ -190,7 +190,7 @@ export default defineComponent({
     display: flex;
     flex-grow: 1;
     padding-top: 15px;
-    padding-bottom: calc(10vh + 20px);
+    padding-bottom: calc(75px + 20px);
     width: 100%;
     gap: 20px;
     flex-direction: column;
@@ -212,7 +212,7 @@ export default defineComponent({
     gap: 15px;
     background-color: white;
     filter: drop-shadow(0px 0px 3px #0000001f);
-    height: 10vh;
+    height: 75px;
 
     .full-width {
       width: 100%;
