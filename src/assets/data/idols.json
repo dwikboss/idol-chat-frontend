@@ -2,11 +2,13 @@
     {
         "id": "minji",
         "display_name": "✨민지✨",
+        "real_name": "Minji",
         "profile_picture": "minji.jpg"
     },
     {
         "id": "hanni",
         "display_name": "하니_hanni_:)",
+        "real_name": "Hanni",
         "profile_picture": "hanni.jpeg"
     }
 ]

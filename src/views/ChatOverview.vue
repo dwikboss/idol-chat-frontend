@@ -3,7 +3,19 @@
     <div class="dot-overlay"></div>
     <div class="overview-header">
       <div class="full-width">
-        <h2><span style="font-family: Helvetica, sans-serif;font-weight: 500;">M</span><span style="font-family: Briem Hand, cursive;font-weight: 200;font-style: italic;">e</span><span style="font-family: Helvetica, sans-serif;font-weight: 700;margin-left: 6px;">S</span><span style="font-family: Helvetica, sans-serif;font-weight: 200;">S</span><span style="font-family: Lora, serif;font-weight: 500;">a</span><span style="font-family: Helvetica, sans-serif;font-weight: 500;">g</span><span style="font-family: Briem Hand, cursive;font-weight: 500;">e</span><span style="font-family: Helvetica, sans-serif;font-weight: 500;">s</span></h2>
+        <!-- <img class="nwjns-logo" src="/images/nwjns.png" alt="nwjns logo"> -->
+        <div class="msg-logo">
+          <h2>
+            <span style="font-family: Helvetica, sans-serif; font-weight: 500">M</span
+            ><span style="font-family: Briem Hand, cursive; font-weight: 200; font-style: italic">e</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 700; margin-left: 6px">S</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 200">S</span
+            ><span style="font-family: Lora, serif; font-weight: 500">a</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 500">g</span
+            ><span style="font-family: Briem Hand, cursive; font-weight: 500">e</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 500">s</span>
+          </h2>
+        </div>
       </div>
     </div>
     <div class="full-width">
@@ -14,6 +26,7 @@
           :name="idol.id"
           :display-name="idol.display_name"
           :profile-picture="idol.profile_picture"
+          :real-name="idol.real_name"
         />
       </div>
     </div>
@@ -57,18 +70,39 @@ export default defineComponent({
 
   .overview-header {
     height: 18vh;
+    margin-bottom: 50px;
 
     .full-width {
       justify-content: flex-end;
-      align-items: flex-start;
+      align-items: center;
       height: 100%;
 
-      h2 {
-        margin-bottom: 25px;
-        font-family: "Micro 5 Charted", sans-serif;
-        font-size: 3rem;
-        font-weight: 100;
-        color: white;
+      // .nwjns-logo {
+      //   position: absolute;
+      //   z-index: 0;
+      //   width: 125px;
+      //   transform: rotate(20deg);
+      //   left: 220px;
+      // }
+
+      .msg-logo {
+        display: flex;
+        align-items: center;
+        background: rgb(255, 255, 255);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
+        padding: 10px 25px 10px 25px;
+        border-radius: 50%;
+        border: 1px solid black;
+        -webkit-box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+        -moz-box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+        box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+
+        h2 {
+          font-family: 'Micro 5 Charted', sans-serif;
+          font-size: 2.2rem;
+          font-weight: 100;
+          color: black;
+        }
       }
     }
   }
