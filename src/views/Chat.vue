@@ -264,6 +264,7 @@ export default defineComponent({
         font-size: 16px;
         background: rgb(255, 255, 255);
         background: linear-gradient(180deg, rgb(255, 255, 255) 0%, rgb(88 154 255) 100%);
+        color: black;
       }
 
       input {
@@ -271,6 +272,7 @@ export default defineComponent({
         flex-grow: 1;
         padding-left: 15px;
         border-style: inset;
+        border-radius: 0px;
 
         &:focus {
           outline: none;
