@@ -61,6 +61,9 @@ export default defineComponent({
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
+    if (!localStorage.getItem('photoSent')) {
+      localStorage.setItem('photoSent', 'false');
+    }
   },
   components: {
     ChatMessage,
@@ -90,10 +93,6 @@ export default defineComponent({
       });
     },
     loadChatHistory() {
-      if (!localStorage.getItem('photoSent')) {
-        localStorage.setItem('photoSent', 'false');
-      }
-
       const history = localStorage.getItem('chatHistory');
       const displayHistory = localStorage.getItem('chatHistoryDisplay');
 
@@ -168,7 +167,7 @@ export default defineComponent({
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.2) {
+          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.5) {
             this.nextMessageGroup = true;
             this.nextMsgPhoto = true;
             this.initBotConversation('photo');
