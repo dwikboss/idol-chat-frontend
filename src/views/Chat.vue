@@ -263,7 +263,7 @@ export default defineComponent({
         width: 15%;
         font-size: 16px;
         background: rgb(255, 255, 255);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(26, 113, 245, 1) 100%);
+        background: linear-gradient(180deg, rgb(255, 255, 255) 0%, rgb(88 154 255) 100%);
       }
 
       input {
