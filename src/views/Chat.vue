@@ -2,6 +2,9 @@
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
+        <div class="back-btn" @click="back">
+          &#60;
+        </div>
         <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>{{ idolData.display_name }}</h4>
@@ -11,12 +14,17 @@
       </div>
     </div>
     <div class="chat-container full-width">
-      <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" />
+      <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
     </div>
     <div class="input-area">
       <div class="full-width">
-        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input"
-          ref="inputField" />
+        <input
+          @keyup.enter="sendChat('')"
+          placeholder="Type your message here..."
+          type="text"
+          v-model="input"
+          ref="inputField"
+        />
       </div>
     </div>
   </div>
@@ -43,7 +51,8 @@ export default defineComponent({
       sendChatCount: 0,
       userSentLast: false,
       retryCount: 0,
-      maxRetries: 5
+      maxRetries: 5,
+      nextMessageGroup: false,
     };
   },
   mounted() {
@@ -57,6 +66,9 @@ export default defineComponent({
     ChatMessage,
   },
   methods: {
+    back() {
+      this.$router.go(-1);
+    },
     initBotConversation() {
       this.sendChat(
         '-1-Continue that part of the conversation of what you just said in no more than 4 words. You can also react a bit more on what you just said.'
@@ -72,24 +84,11 @@ export default defineComponent({
     },
     loadChatHistory() {
       const history = localStorage.getItem('chatHistory');
+      const displayHistory = localStorage.getItem('chatHistoryDisplay');
+      console.log(JSON.parse(displayHistory || '{}'));
       if (history) {
-        let parsedHistory = JSON.parse(history);
         this.chatHistory = JSON.parse(history);
-
-        this.chatMessages = parsedHistory
-          .filter((message: any) => {
-            return !(message.role === 'user' && message.content.includes('-1-'));
-          })
-          .map((message: any) => {
-            if (message.role === 'assistant' && typeof message.content === 'string') {
-              try {
-                message.content = JSON.parse(message.content);
-              } catch (e) {
-                console.error('Failed to parse message content', e);
-              }
-            }
-            return message;
-          });
+        this.chatMessages = JSON.parse(displayHistory || '{}');
       }
     },
     fetchIdolData() {
@@ -98,7 +97,12 @@ export default defineComponent({
       if (idol) {
         this.idolData = idol;
       } else {
-        this.idolData = { id: 'unknown', display_name: 'Unknown', profile_picture: 'default.jpg' };
+        this.idolData = {
+          id: 'unknown',
+          display_name: 'Unknown',
+          real_name: 'Unknown',
+          profile_picture: 'default.jpg',
+        };
       }
     },
     async sendChat(customContent: string) {
@@ -108,7 +112,7 @@ export default defineComponent({
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
         this.input = '';
-        
+
         (this.$refs.inputField as HTMLInputElement).blur();
       } else if (customContent.trim() !== '') {
         this.userSentLast = false;
@@ -126,12 +130,20 @@ export default defineComponent({
 
           const minjiReply = response.data.reply.choices[0].message.content;
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
-          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
+          this.chatMessages.push({
+            role: 'assistant',
+            content: JSON.parse(minjiReply),
+            grouped_message: this.nextMessageGroup,
+          });
+          this.nextMessageGroup = false;
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+          localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-          if (this.userSentLast && Math.random() < 0.3) {
+          if (this.userSentLast && Math.random() < 0.25) {
+            this.nextMessageGroup = true;
             this.initBotConversation();
           }
+
           this.loading = false;
           this.retryCount = 0;
         } catch (error) {
@@ -154,7 +166,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .page.chat {
-  background-color: #fff2fc;
+  background-image: repeating-conic-gradient(#8f9fd71c 0% 25%, #ffffff 0% 50%);
+  background-position: 0 0, 32px 32px;
+  background-size: 64px 64px;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -176,6 +191,19 @@ export default defineComponent({
       display: flex;
       gap: 15px;
 
+      .back-btn {
+        background-color: white;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+        border: 1px solid black;
+        border-radius: 50%;
+        align-self: center
+      }
+
       .chat-header-text {
         font-family: 'Roboto';
         display: flex;
@@ -192,6 +220,7 @@ export default defineComponent({
         width: 50px;
         height: 50px;
         border-radius: 50%;
+        border: 1px solid black;
       }
     }
   }
@@ -199,16 +228,16 @@ export default defineComponent({
   .chat-container {
     display: flex;
     flex-grow: 1;
-    padding-top: 15px;
+    padding-top: calc(82px + 20px);
     padding-bottom: 20px;
     width: 100%;
-    gap: 20px;
     flex-direction: column;
     height: 0;
     overflow: auto;
+    gap: 15px;
     justify-content: flex-start;
 
-    &> :first-child {
+    & > :first-child {
       margin-top: auto;
     }
   }
