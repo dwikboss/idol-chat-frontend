@@ -76,7 +76,7 @@ export default defineComponent({
     initBotConversation(type: string) {
       if (type == 'photo') {
         this.sendChat(
-          '-1-Act as tho you want to show the user something real quick. You just got coffee. Say something like "oh btw, look i just got coffee" or something in the style of how Minji would talk!'
+          '-1-Act as tho you want to show the user something real quick. You just got coffee. Say something like "oh btw, look i just got coffee" or something along the lines of that. Say it in the style of how Minji would talk! Btw, on the front end, i will inject a pic of minji with a coffee so the user will see a pic with your message so talk accordingly if the user talks about it further.'
         );
       } else {
         this.sendChat(
@@ -167,7 +167,7 @@ export default defineComponent({
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.2) {
+          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.15) {
             this.nextMessageGroup = true;
             this.nextMsgPhoto = true;
             this.initBotConversation('photo');
