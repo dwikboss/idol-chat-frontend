@@ -35,7 +35,6 @@ import idols from '@/assets/data/idols.json';
 import axios from 'axios';
 import ChatMessage from '@/components/ChatMessage.vue';
 import type Idol from '@/interfaces/_IIdol';
-import type Idols from '@/interfaces/_IIdols';
 import type Message from '@/interfaces/_IMessage';
 
 export default defineComponent({
@@ -52,11 +51,13 @@ export default defineComponent({
       retryCount: 0,
       maxRetries: 5,
       nextMessageGroup: false,
+      nextMsgPhoto: false,
     };
   },
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
+    this.photoEvent();
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -68,10 +69,17 @@ export default defineComponent({
     back() {
       this.$router.go(-1);
     },
-    initBotConversation() {
-      this.sendChat(
-        '-1-Continue that part of the conversation of what you just said in no more than 4 words. You can also react a bit more on what you just said.'
-      );
+    photoEvent() {},
+    initBotConversation(type: string) {
+      if (type == 'photo') {
+        this.sendChat(
+          '-1-Act as tho you want to show the user something real quick. You just got coffee. Say something like "oh btw, look i just got coffee" or something in the style of how Minji would talk!'
+        );
+      } else {
+        this.sendChat(
+          '-1-Continue that part of the conversation of what you just said in no more than 4 words. You can also react a bit more on what you just said.'
+        );
+      }
     },
     scrollToEnd() {
       this.$nextTick(() => {
@@ -82,13 +90,23 @@ export default defineComponent({
       });
     },
     loadChatHistory() {
+      if (!localStorage.getItem('photoSent')) {
+        localStorage.setItem('photoSent', 'false');
+      }
+
       const history = localStorage.getItem('chatHistory');
       const displayHistory = localStorage.getItem('chatHistoryDisplay');
-      console.log(JSON.parse(displayHistory || '{}'));
-      if (history) {
-        this.chatHistory = JSON.parse(history);
-        this.chatMessages = JSON.parse(displayHistory || '{}');
-      }
+
+      this.chatHistory = history ? JSON.parse(history) : [];
+
+      this.chatMessages = displayHistory
+        ? JSON.parse(displayHistory).map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+            media: msg.media || '',
+            grouped_message: msg.grouped_message || false,
+          }))
+        : [];
     },
     fetchIdolData() {
       const idolName = this.$route.params.idolName as string;
@@ -129,18 +147,39 @@ export default defineComponent({
 
           const minjiReply = response.data.reply.choices[0].message.content;
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
-          this.chatMessages.push({
-            role: 'assistant',
-            content: JSON.parse(minjiReply),
-            grouped_message: this.nextMessageGroup,
-          });
+
+          if (this.nextMsgPhoto) {
+            this.chatMessages.push({
+              role: 'assistant',
+              content: JSON.parse(minjiReply),
+              media: 'minji_food_1.jpeg',
+              grouped_message: this.nextMessageGroup || false,
+            });
+            this.nextMsgPhoto = false;
+          } else {
+            this.chatMessages.push({
+              role: 'assistant',
+              content: JSON.parse(minjiReply),
+              grouped_message: this.nextMessageGroup || false,
+            });
+          }
+
           this.nextMessageGroup = false;
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
+          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.1) {
+            this.nextMessageGroup = true;
+            this.nextMsgPhoto = true;
+            this.initBotConversation('photo');
+
+            localStorage.setItem('photoSent', 'true');
+            localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
+          }
+
           if (this.userSentLast && Math.random() < 0.25) {
             this.nextMessageGroup = true;
-            this.initBotConversation();
+            this.initBotConversation('convo');
           }
 
           this.loading = false;
