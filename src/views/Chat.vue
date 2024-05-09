@@ -2,9 +2,7 @@
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
-        <div class="back-btn" @click="back">
-          &#60;
-        </div>
+        <div class="back-btn" @click="back">&#60;</div>
         <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>{{ idolData.display_name }}</h4>
@@ -25,6 +23,7 @@
           v-model="input"
           ref="inputField"
         />
+        <button @click="sendChat('')">send</button>
       </div>
     </div>
   </div>
@@ -201,7 +200,7 @@ export default defineComponent({
         color: black;
         border: 1px solid black;
         border-radius: 50%;
-        align-self: center
+        align-self: center;
       }
 
       .chat-header-text {
@@ -247,8 +246,9 @@ export default defineComponent({
     padding: 15px 0 15px 0;
     display: flex;
     gap: 15px;
-    background-color: white;
+    border-top: 1px solid black;
     filter: drop-shadow(0px 0px 3px #0000001f);
+    background-color: rgb(255, 255, 255);
 
     .full-width {
       width: 100%;
@@ -257,24 +257,20 @@ export default defineComponent({
       align-items: center;
 
       button {
-        border-radius: 50%;
-        border: none;
-        width: 45px;
-        height: 45px;
-        background-color: rgb(242, 101, 247);
-        color: white;
-        font-family: 'Roboto';
-        font-weight: 700;
-        font-size: 1.25rem;
+        border-style: inset;
+        height: 100%;
+        font-family: 'Times New Roman', Times, serif;
+        width: 15%;
+        font-size: 16px;
+        background: rgb(255, 255, 255);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(26, 113, 245, 1) 100%);
       }
 
       input {
         height: 44px;
         flex-grow: 1;
-        border: none;
-        border-radius: 999px;
         padding-left: 15px;
-        border: 1px solid rgba(0, 0, 0, 0.082);
+        border-style: inset;
 
         &:focus {
           outline: none;
