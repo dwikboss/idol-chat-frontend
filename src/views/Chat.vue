@@ -15,7 +15,6 @@
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
     </div>
     <div class="input-area">
-      <button @click="fetchVoiceMessage('hi everyone!')">Download Voice Message</button>
       <div class="full-width">
         <input
           @keyup.enter="sendChat('')"
@@ -60,8 +59,6 @@ export default defineComponent({
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
-
-    this.fetchVoiceMessage('lol');
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -138,7 +135,7 @@ export default defineComponent({
         if (this.voiceEvent) {
           const inputConstr =
             this.input +
-            " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. okay i do voice message real quick because i'm walking to the practice room. but uhm... 그건 또 어떻게 말해요? oh right, what did you do today? OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}]";
+            " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. okay i do voice message real quick because i'm walking to the practice room. but uhm... 그건 또 어떻게 말해요? oh right, what did you do today? OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS";
           const newVoiceMessage = { role: 'user', content: inputConstr };
           const newUserMessage = { role: 'user', content: this.input };
 
@@ -181,9 +178,7 @@ export default defineComponent({
             this.nextMsgPhoto = false;
           } else if (this.voiceEvent) {
             const prepVoice = JSON.parse(minjiReply);
-            console.log(prepVoice.English);
-            const voiceMessageResponse = await this.fetchVoiceMessage(prepVoice);
-            console.log(voiceMessageResponse);
+            const voiceMessageResponse = await this.fetchVoiceMessage(prepVoice.English);
           } else {
             this.chatMessages.push({
               role: 'assistant',
@@ -226,41 +221,44 @@ export default defineComponent({
 
       await makeRequest();
     },
-    async fetchVoiceMessage(text: string) {
+    async fetchVoiceMessage(prepVoice: string) {
+      const url = 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8';
+      const data = {
+        voice_settings: {
+          style: 1,
+          stability: 1,
+          similarity_boost: 1,
+          use_speaker_boost: true
+        },
+        text: prepVoice,
+        model_id: "eleven_multilingual_v2"
+      };
+      const headers = {
+        'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
+        'Content-Type': 'application/json'
+      };
+
       try {
         const response = await axios({
           method: 'post',
-          url: 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8',
-          headers: {
-            'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
-            'Content-Type': 'application/json',
-          },
-          data: {
-            voice_settings: {
-              stability: 0.3,
-              similarity_boost: 1,
-              style: 1,
-              use_speaker_boost: true,
-            },
-            text: text,
-          },
-          responseType: 'blob', // Set responseType to 'blob' for handling binary data
+          url: url,
+          headers: headers,
+          data: data,
+          responseType: 'blob'
         });
 
         // Create a URL for the blob
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
+        const downloadUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
         const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'voiceMessage.mp3'); // Name the download file
+        link.href = downloadUrl;
+        link.setAttribute('download', 'voiceMessage.mp3');  // Name the download file
         document.body.appendChild(link);
         link.click();
-        if (link.parentNode) {
-          link.parentNode.removeChild(link);
-        }
+
       } catch (error) {
         console.error('Failed to fetch voice message:', error);
       }
-    },
+    }
   },
 });
 </script>
