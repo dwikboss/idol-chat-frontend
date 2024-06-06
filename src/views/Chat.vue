@@ -50,14 +50,15 @@ export default defineComponent({
       userSentLast: false,
       retryCount: 0,
       maxRetries: 5,
+      voiceMessages: 0,
       nextMessageGroup: false,
       nextMsgPhoto: false,
+      voiceEvent: false,
     };
   },
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
-    this.photoEvent();
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -72,7 +73,6 @@ export default defineComponent({
     back() {
       this.$router.go(-1);
     },
-    photoEvent() {},
     initBotConversation(type: string) {
       if (type == 'photo') {
         this.sendChat(
@@ -122,13 +122,28 @@ export default defineComponent({
       }
     },
     async sendChat(customContent: string) {
-      if (this.input.trim() !== '') {
-        this.userSentLast = true;
-        const newUserMessage = { role: 'user', content: this.input };
-        this.chatHistory.push(newUserMessage);
-        this.chatMessages.push(newUserMessage);
-        this.input = '';
+      if (Math.random() < 0.9) {
+        this.voiceEvent = true;
+      }
 
+      if (this.input.trim() !== '') {
+        if (this.voiceEvent) {
+          const inputConstr =
+            this.input +
+            " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. okay i do voice message real quick because i'm walking to the practice room. but uhm... 그건 또 어떻게 말해요? oh right, what did you do today? OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}]";
+          const newVoiceMessage = { role: 'user', content: inputConstr };
+          const newUserMessage = { role: 'user', content: this.input };
+
+          this.chatHistory.push(newVoiceMessage);
+          this.chatMessages.push(newUserMessage);
+        } else {
+          const newUserMessage = { role: 'user', content: this.input };
+          this.chatHistory.push(newUserMessage);
+          this.chatMessages.push(newUserMessage);
+        }
+
+        this.userSentLast = true;
+        this.input = '';
         (this.$refs.inputField as HTMLInputElement).blur();
       } else if (customContent.trim() !== '') {
         this.userSentLast = false;
@@ -145,6 +160,8 @@ export default defineComponent({
           });
 
           const minjiReply = response.data.reply.choices[0].message.content;
+          if (this.voiceEvent) {
+          }
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
 
           if (this.nextMsgPhoto) {
