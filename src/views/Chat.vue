@@ -13,6 +13,7 @@
     </div>
     <div class="chat-container full-width">
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
+      <audio v-if="voiceMessageUrl" controls :src="voiceMessageUrl"></audio>
     </div>
     <div class="input-area">
       <div class="full-width">
@@ -54,6 +55,7 @@ export default defineComponent({
       nextMessageGroup: false,
       nextMsgPhoto: false,
       voiceEvent: false,
+      voiceMessageUrl: '' as any,
     };
   },
   mounted() {
@@ -104,6 +106,7 @@ export default defineComponent({
             content: msg.content,
             media: msg.media || '',
             grouped_message: msg.grouped_message || false,
+            voice: msg.voice,
           }))
         : [];
     },
@@ -132,10 +135,19 @@ export default defineComponent({
       }
 
       if (this.input.trim() !== '') {
+        let inputConstr;
         if (this.voiceEvent) {
-          const inputConstr =
-            this.input +
-            " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. okay i do voice message real quick because i'm walking to the practice room. but uhm... 그건 또 어떻게 말해요? oh right, what did you do today? OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS";
+          console.log();
+          if (this.voiceMessages == 0) {
+            inputConstr =
+              this.input +
+              " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. 'okay i do voice message real quick because i'm walking to the practice room. but uhm... 그건 또 어떻게 말해요? oh right, what did you do today?' OR SOMETHING LIKE THAT. BE CREATIVE AND CHANGE IT UP. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS. THIS IS THE FIRST VOICE MESSAGE, SO INCLUDE IN THE VOICE MESSAGE THAT YOURE BUSY OR DOING SOMETHING OR WALKING OR WHATEVER TO LET THE USER KNOW THAT WHY YOURE SENDING A VOICE MESSAGE";
+          } else {
+            inputConstr =
+              this.input +
+              " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. 'yeah i get what youre saying. but uhm... 그건 또 어떻게 말해요? oh right, we do it differently here' OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS";
+          }
+
           const newVoiceMessage = { role: 'user', content: inputConstr };
           const newUserMessage = { role: 'user', content: this.input };
 
@@ -177,8 +189,14 @@ export default defineComponent({
             });
             this.nextMsgPhoto = false;
           } else if (this.voiceEvent) {
-            const prepVoice = JSON.parse(minjiReply);
-            const voiceMessageResponse = await this.fetchVoiceMessage(prepVoice.English);
+            const prepVoice = JSON.parse(minjiReply).English;
+            this.voiceMessageUrl = await this.fetchVoiceMessage(prepVoice);
+            this.chatMessages.push({
+              role: 'assistant',
+              content: JSON.parse(minjiReply),
+              grouped_message: false,
+              voice: this.voiceMessageUrl,
+            });
           } else {
             this.chatMessages.push({
               role: 'assistant',
@@ -191,7 +209,12 @@ export default defineComponent({
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.85) {
+          if (
+            this.userSentLast &&
+            localStorage.getItem('photoSent') == 'false' &&
+            Math.random() < 0.85 &&
+            !this.voiceEvent
+          ) {
             this.nextMessageGroup = true;
             this.nextMsgPhoto = true;
             this.initBotConversation('photo');
@@ -200,7 +223,7 @@ export default defineComponent({
             localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
           }
 
-          if (this.userSentLast && Math.random() < 0.25) {
+          if (this.userSentLast && Math.random() < 0.25 && !this.voiceEvent) {
             this.nextMessageGroup = true;
             this.initBotConversation('convo');
           }
@@ -221,44 +244,46 @@ export default defineComponent({
 
       await makeRequest();
     },
-    async fetchVoiceMessage(prepVoice: string) {
-      const url = 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8';
-      const data = {
-        voice_settings: {
-          style: 1,
-          stability: 1,
-          similarity_boost: 1,
-          use_speaker_boost: true
-        },
-        text: prepVoice,
-        model_id: "eleven_multilingual_v2"
-      };
-      const headers = {
-        'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
-        'Content-Type': 'application/json'
-      };
+    fetchVoiceMessage(prepVoice: string) {
+      return new Promise((resolve, reject) => {
+        const url = 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8';
+        const data = {
+          voice_settings: {
+            style: 1,
+            stability: 0.3,
+            similarity_boost: 1,
+            use_speaker_boost: true,
+          },
+          text: prepVoice,
+          model_id: 'eleven_multilingual_v2',
+        };
+        const headers = {
+          'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
+          'Content-Type': 'application/json',
+        };
 
-      try {
-        const response = await axios({
+        axios({
           method: 'post',
           url: url,
           headers: headers,
           data: data,
-          responseType: 'blob'
-        });
-
-        // Create a URL for the blob
-        const downloadUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.setAttribute('download', 'voiceMessage.mp3');  // Name the download file
-        document.body.appendChild(link);
-        link.click();
-
-      } catch (error) {
-        console.error('Failed to fetch voice message:', error);
-      }
-    }
+          responseType: 'blob',
+        })
+          .then((response) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(response.data);
+            reader.onloadend = () => {
+              const base64data = reader.result;
+              resolve(base64data);
+            };
+            reader.onerror = (error) => reject(error);
+          })
+          .catch((error) => {
+            console.error('Failed to fetch voice message:', error);
+            reject(error);
+          });
+      });
+    },
   },
 });
 </script>
