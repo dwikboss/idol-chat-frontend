@@ -55,6 +55,7 @@ export default defineComponent({
       nextMsgPhoto: false,
       voiceEvent: false,
       voiceMessageUrl: '' as any,
+      amountOfVM: 0,
     };
   },
   mounted() {
@@ -125,7 +126,7 @@ export default defineComponent({
     },
     async sendChat(customContent: string) {
       if (!this.voiceEvent) {
-        if (Math.random() < 0.9) {
+        if (Math.random() < 0.1) {
           this.voiceEvent = true;
         }
       } else if (this.voiceMessages > 4) {
@@ -211,7 +212,7 @@ export default defineComponent({
           if (
             this.userSentLast &&
             localStorage.getItem('photoSent') == 'false' &&
-            Math.random() < 0.85 &&
+            Math.random() < 0.25 &&
             !this.voiceEvent
           ) {
             this.nextMessageGroup = true;
@@ -352,6 +353,7 @@ export default defineComponent({
     display: flex;
     flex-grow: 1;
     padding-top: calc(82px + 20px);
+    padding-bottom: calc(82px + 20px);
     padding-bottom: 20px;
     width: 100%;
     flex-direction: column;
@@ -373,6 +375,9 @@ export default defineComponent({
     border-top: 1px solid black;
     filter: drop-shadow(0px 0px 3px #0000001f);
     background-color: rgb(255, 255, 255);
+    position: fixed;
+    z-index: 999;
+    bottom: 0;
 
     .full-width {
       width: 100%;
