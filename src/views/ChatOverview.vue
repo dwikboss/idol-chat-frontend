@@ -68,6 +68,7 @@ export default defineComponent({
   background: linear-gradient(180deg, rgba(118, 138, 195, 1) 0%, rgba(255, 255, 255, 1) 100%);
   height: 100vh;
   overflow: hidden;
+  position: relative;
 
   .dot-overlay {
     background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px);
@@ -111,7 +112,7 @@ export default defineComponent({
 
   .minji-sb {
     height: 70vh;
-    position: fixed;
+    position: absolute;
     bottom: 0;
     right: 0;
     left: 50%;
