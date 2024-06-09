@@ -34,7 +34,7 @@
         </div>
       </div>
     </div>
-    <div class="chat-container full-width">
+    <div class="chat-container full-width" ref="chatContainer">
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
     </div>
     <div class="input-area">
@@ -83,19 +83,23 @@ export default defineComponent({
     };
   },
   mounted() {
-    // this.fetchIdolData();
     this.loadChatHistory();
   },
   updated() {
-    this.$nextTick(() => this.scrollToEnd());
-    if (!localStorage.getItem('photoSent')) {
-      localStorage.setItem('photoSent', 'false');
-    }
+    this.scrollToBottom();
   },
   components: {
     ChatMessage,
   },
   methods: {
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const container = this.$refs.chatContainer as HTMLDivElement;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+    },
     forceVoice() {
       if (!this.voiceEvent) {
         this.voiceEvent = true;
