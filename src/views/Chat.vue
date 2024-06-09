@@ -423,7 +423,7 @@ export default defineComponent({
     display: flex;
     flex-grow: 1;
     padding-top: calc(82px + 20px);
-    padding-bottom: 100px;
+    padding-bottom: calc(82px + 20px);
     width: 100%;
     flex-direction: column;
     height: 0;
