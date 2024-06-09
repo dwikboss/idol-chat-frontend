@@ -3,14 +3,14 @@
     <h3>Settings</h3>
     <div class="chat-broken">
       <p>Broken chat?</p>
-      <button class="settings-buttons" @click="clearHistory">Reset & Delete chat history</button>
+      <button class="settings-button" @click="clearHistory">Reset & Delete chat history</button>
     </div>
     <div class="voice-settings">
       <p>Force chat into voice event</p>
       <p style="color: red" v-if="voiceEvent">
         The chat is currently in a voice event with {{ 4 - voiceMessages }} voice messages left!
       </p>
-      <button class="settings-buttons" @click="forceVoice">Enable</button>
+      <button class="settings-button" @click="forceVoice">Enable</button>
     </div>
     <button class="close-button" @click="openSettings">Close settings</button>
     <!-- <div @click="clearHistory" class="clear-chathistory">
@@ -343,12 +343,11 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
 
-  .settings-buttons {
+  .settings-button {
     background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
     border: 1px solid black;
     font-size: 16px;
     width: 100%;
-    z-index: 999;
   }
 
   .close-button {
