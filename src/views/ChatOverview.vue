@@ -3,36 +3,21 @@
     <div class="dot-overlay"></div>
     <div class="overview-header">
       <div class="full-width">
-        <!-- <img class="nwjns-logo" src="/images/nwjns.png" alt="nwjns logo"> -->
         <div class="msg-logo">
-          <h2>
-            <span style="font-family: Helvetica, sans-serif; font-weight: 500">M</span
-            ><span style="font-family: Briem Hand, cursive; font-weight: 200; font-style: italic">e</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 500; margin-left: 6px; font-size: 1.6rem"
-              >S</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 200; font-size: 1.6rem">S</span
-            ><span style="font-family: Lora, serif; font-weight: 500">a</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 500">g</span
-            ><span style="font-family: Briem Hand, cursive; font-weight: 500">e</span
-            ><span style="font-family: Times New Roman, serif; font-weight: 500; font-size: 2.5rem">s</span>
-          </h2>
+          <img class="nwjns-logo" src="/images/minji-chat-logo.png" alt="nwjns logo" />
         </div>
       </div>
     </div>
-    <div class="full-width">
+    <img class="minji-sb" src="/images/minji-sb.png" alt="minji" />
+    <!-- <img  class="minji-sb" src="/images/minji-home.png" alt="minji" /> -->
+    <!-- <img class="bunny" src="/images/bunny.png" alt="bunny" /> -->
+    <div class="full-width home-splash">
       <div class="chat-list">
-        <ChatListItem
-          v-for="idol in idols"
-          :key="idol.id"
-          :name="idol.id"
-          :display-name="idol.display_name"
-          :profile-picture="idol.profile_picture"
-          :real-name="idol.real_name"
-        />
+        <button class="chat-button" @click="openChat()">Open chat!</button>
       </div>
-      <div @click="clearHistory" class="clear-chathistory">
+      <!-- <div @click="clearHistory" class="clear-chathistory">
         click here if your chat is broken (you will lose your chat history tho 😔)
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -49,10 +34,13 @@ export default defineComponent({
   },
   data() {
     return {
-      idols,
+      idols
     };
   },
   methods: {
+    openChat() {
+      this.$router.push('/chat');
+    },
     clearHistory() {
       let text = 'Are you sure you want to delete your chat history?';
       if (confirm(text) == true) {
@@ -73,6 +61,7 @@ export default defineComponent({
   background: rgb(118, 138, 195);
   background: linear-gradient(180deg, rgba(118, 138, 195, 1) 0%, rgba(255, 255, 255, 1) 100%);
   height: 100vh;
+  overflow: hidden;
 
   .dot-overlay {
     background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px);
@@ -86,33 +75,23 @@ export default defineComponent({
   }
 
   .overview-header {
-    height: 18vh;
-    margin-bottom: 50px;
+    height: 30vh;
 
     .full-width {
       justify-content: flex-end;
       align-items: center;
       height: 100%;
 
-      // .nwjns-logo {
-      //   position: absolute;
-      //   z-index: 0;
-      //   width: 125px;
-      //   transform: rotate(20deg);
-      //   left: 220px;
-      // }
-
       .msg-logo {
         display: flex;
-        align-items: center;
-        background: rgb(255, 255, 255);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
-        padding: 10px 25px 10px 25px;
-        border-radius: 50%;
-        border: 1px solid black;
-        -webkit-box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
-        -moz-box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
-        box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 1);
+        justify-content: center;
+
+        .nwjns-logo {
+          width: 90%;
+          margin-top: 75px;
+
+          animation: tilt-logo 2s linear infinite;
+        }
 
         h2 {
           font-family: 'Micro 5 Charted', sans-serif;
@@ -122,6 +101,22 @@ export default defineComponent({
         }
       }
     }
+  }
+
+  .minji-sb {
+    width: 120%;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+
+  .bunny {
+    width: 42%;
+    position: absolute;
+    left: -10px;
+    top: 32%;
+    animation: pulse 1.5s linear infinite;
   }
 
   .full-width {
@@ -146,6 +141,26 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       gap: 15px;
+
+      .chat-button {
+        background: rgb(255, 255, 255);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
+        padding: 10px 25px 10px 25px;
+        border-radius: 99px;
+        border: 1px solid black;
+        -webkit-box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+        -moz-box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+        box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
+        position: fixed;
+        width: 50%;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        font-family: Helvetica;
+        font-size: 24px;
+        text-align: center;
+      }
     }
   }
 
@@ -159,6 +174,30 @@ export default defineComponent({
     font-family: 'Roboto';
     color: black;
     font-weight: 600;
+  }
+}
+
+@keyframes tilt-logo {
+  0% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    scale: (1);
+  }
+  50% {
+    scale: (1.1);
+  }
+  100% {
+    scale: (1);
   }
 }
 </style>
