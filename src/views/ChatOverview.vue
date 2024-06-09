@@ -110,7 +110,7 @@ export default defineComponent({
   }
 
   .minji-sb {
-    height: 72vh;
+    height: 70vh;
     position: fixed;
     bottom: 0;
     right: 0;
