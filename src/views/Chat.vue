@@ -3,9 +3,9 @@
     <div class="overview-header">
       <div class="full-width">
         <div class="back-btn" @click="back">&#60;</div>
-        <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
+        <img src="/images/profile_pictures/minji.jpg" alt="Profile Picture" />
         <div class="chat-header-text">
-          <h4>{{ idolData.display_name }}</h4>
+          <h4>✨민지✨</h4>
           <p v-if="loading">Typing...</p>
           <p v-else>Online</p>
         </div>
@@ -59,7 +59,7 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.fetchIdolData();
+    // this.fetchIdolData();
     this.loadChatHistory();
   },
   updated() {
@@ -110,23 +110,23 @@ export default defineComponent({
           }))
         : [];
     },
-    fetchIdolData() {
-      const idolName = this.$route.params.idolName as string;
-      const idol = idols.find((idol) => idol.id === idolName);
-      if (idol) {
-        this.idolData = idol;
-      } else {
-        this.idolData = {
-          id: 'unknown',
-          display_name: 'Unknown',
-          real_name: 'Unknown',
-          profile_picture: 'default.jpg',
-        };
-      }
-    },
+    // fetchIdolData() {
+    //   const idolName = this.$route.params.idolName as string;
+    //   const idol = idols.find((idol) => idol.id === idolName);
+    //   if (idol) {
+    //     this.idolData = idol;
+    //   } else {
+    //     this.idolData = {
+    //       id: 'unknown',
+    //       display_name: 'Unknown',
+    //       real_name: 'Unknown',
+    //       profile_picture: 'default.jpg',
+    //     };
+    //   }
+    // },
     async sendChat(customContent: string) {
       if (!this.voiceEvent) {
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.99) {
           this.voiceEvent = true;
         }
       } else if (this.voiceMessages > 4) {

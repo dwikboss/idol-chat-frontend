@@ -11,10 +11,9 @@ const routes = [
     component: ChatOverview,
   },
   {
-    path: '/chat/:idolName',
+    path: '/chat',
     name: PageName.CHAT,
     component: Chat,
-    props: true
   },
 ];
 

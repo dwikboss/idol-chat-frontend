@@ -1,7 +1,7 @@
 <template>
   <div class="bubble-wrapper" :class="chat.role">
     <div class="message-info" v-if="chat.role != 'user'" :class="chat.grouped_message ? 'transparent' : ''">
-      <img :src="`/images/profile_pictures/${idol.profile_picture}`" alt="pfp" />
+      <img src="/images/profile_pictures/minji.jpg" alt="pfp" />
     </div>
     <div class="message-bubble" :class="chat.role" v-bind:class="audio">
       <p v-if="!chat.voice">{{ formatMessage }}</p>
