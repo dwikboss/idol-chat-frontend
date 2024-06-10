@@ -169,9 +169,11 @@ export default defineComponent({
         if (Math.random() < 0.01) {
           this.voiceEvent = true;
         }
-      } else if (this.voiceMessages > 4) {
-        this.voiceEvent = false;
+      } else if (this.voiceMessages == 3) {
         this.voiceMessages = 0;
+        this.voiceEvent = false;
+        console.log('done');
+        console.log(this.voiceMessages);
       }
 
       if (this.input.trim() !== '') {
