@@ -5,6 +5,10 @@
       <p>Broken chat?</p>
       <button class="settings-button" @click="clearHistory">Reset & Delete chat history</button>
     </div>
+    <div class="chat-broken">
+      <p>Force image event</p>
+      <button class="settings-button" @click="forceImage">Force image</button>
+    </div>
     <div class="voice-settings">
       <p>Force chat into voice event</p>
       <p style="color: red" v-if="voiceEvent">
@@ -80,11 +84,15 @@ export default defineComponent({
       voiceMessageUrl: '' as any,
       amountOfVM: 0,
       settingsOpen: false,
+      imageChance: 0.25,
     };
   },
   mounted() {
     this.loadChatHistory();
     this.scrollToEnd();
+    if (!localStorage.getItem('photoSent')) {
+      localStorage.setItem('photoSent', 'false');
+    }
   },
   updated() {
     this.scrollToBottom();
@@ -110,6 +118,9 @@ export default defineComponent({
       if (!this.voiceEvent) {
         this.voiceEvent = true;
       }
+    },
+    forceImage() {
+      this.imageChance = 0.99;
     },
     openSettings() {
       this.settingsOpen = !this.settingsOpen;
@@ -254,7 +265,7 @@ export default defineComponent({
           if (
             this.userSentLast &&
             localStorage.getItem('photoSent') == 'false' &&
-            Math.random() < 0.25 &&
+            Math.random() < this.imageChance &&
             !this.voiceEvent
           ) {
             this.nextMessageGroup = true;
