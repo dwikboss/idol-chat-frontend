@@ -167,7 +167,7 @@ export default defineComponent({
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.5) {
+          if (this.userSentLast && localStorage.getItem('photoSent') == 'false' && Math.random() < 0.3) {
             this.nextMessageGroup = true;
             this.nextMsgPhoto = true;
             this.initBotConversation('photo');
