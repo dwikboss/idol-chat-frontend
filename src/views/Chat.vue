@@ -126,8 +126,8 @@ export default defineComponent({
         localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
 
         if (this.userSentLast) {
-          if (Math.random() < 0.25) {
-            console.log('Triggering additional bot conversation');
+          if (Math.random() < 0.3) {
+            console.log(Math.random());
             this.initBotConversation();
           }
         }
