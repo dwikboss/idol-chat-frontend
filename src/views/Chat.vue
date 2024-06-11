@@ -15,7 +15,7 @@
     </div>
     <div class="input-area">
       <div class="full-width">
-        <input @keyup.enter="sendChat" placeholder="Type your message here..." type="text" v-model="input" />
+        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input" />
       </div>
     </div>
   </div>
@@ -37,13 +37,21 @@ export default defineComponent({
       idolData: {} as Idol,
       chatHistory: [] as any,
       chatMessages: [] as Message[],
+      randomMessages: [
+        '-1-Can you act like youre gonna get something real quick. be creative, dont copy my example!',
+        '-1-Can you act like youre gonna say hi to one of the members real quick becuase they just returned from doing something. switch it up! be creative, dont copy my example!',
+        '-1-Can you act like youre super bored? Ask the user something like what theyre gonna do soon. use "btw" or something similar. switch it up! be creative, dont copy my example!',
+        '-1-Can you ask for my opinion on a random thing about something youre talking about with the members? use "oh btw" or something similar. switch it up! be creative, dont copy my example!',
+      ] as any,
       input: '',
-      loading: false as boolean
+      usedMessages: new Set(),
+      loading: false as boolean,
     };
   },
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
+    this.startBotInitiationTimer();
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -52,6 +60,33 @@ export default defineComponent({
     ChatMessage,
   },
   methods: {
+    startBotInitiationTimer() {
+      const initiateConversation = () => {
+        if (this.usedMessages.size >= this.randomMessages.length) {
+          console.log('All random messages have been used. Stopping further messages.');
+          return;
+        }
+        const delay = Math.random() * (5 * 60000 - 1 * 60000) + 1 * 60000;
+        this.initBotConversation();
+        setTimeout(initiateConversation, delay);
+      };
+      initiateConversation();
+    },
+    initBotConversation() {
+      if (this.usedMessages.size < this.randomMessages.length) {
+        let randomIndex;
+        
+        do {
+          randomIndex = Math.floor(Math.random() * this.randomMessages.length);
+        } while (this.usedMessages.has(randomIndex));
+
+        this.usedMessages.add(randomIndex);
+        const randomMessage = this.randomMessages[randomIndex];
+        this.sendChat(randomMessage);
+      } else {
+        console.log('All messages have been used.');
+      }
+    },
     scrollToEnd() {
       this.$nextTick(() => {
         const chatArea = this.$el.querySelector('.chat-container');
@@ -65,16 +100,21 @@ export default defineComponent({
       if (history) {
         let parsedHistory = JSON.parse(history);
         this.chatHistory = JSON.parse(history);
-        this.chatMessages = parsedHistory.map((message: any) => {
-          if (message.role === 'assistant' && typeof message.content === 'string') {
-            try {
-              message.content = JSON.parse(message.content);
-            } catch (e) {
-              console.error('Failed to parse message content', e);
+
+        this.chatMessages = parsedHistory
+          .filter((message: any) => {
+            return !(message.role === 'user' && message.content.includes('-1-'));
+          })
+          .map((message: any) => {
+            if (message.role === 'assistant' && typeof message.content === 'string') {
+              try {
+                message.content = JSON.parse(message.content);
+              } catch (e) {
+                console.error('Failed to parse message content', e);
+              }
             }
-          }
-          return message;
-        });
+            return message;
+          });
       }
     },
     fetchIdolData() {
@@ -86,29 +126,34 @@ export default defineComponent({
         this.idolData = { id: 'unknown', display_name: 'Unknown', profile_picture: 'default.jpg' };
       }
     },
-    async sendChat() {
+    async sendChat(customContent: string) {
       if (this.input.trim() !== '') {
         const newUserMessage = { role: 'user', content: this.input };
-        console.log(this.chatHistory);
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
 
         this.input = '';
-        this.loading = true;
-
-        try {
-          const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
-            chatHistory: this.chatHistory,
-          });
-
-          const minjiReply = response.data.reply.choices[0].message.content;
-          this.chatHistory.push({ role: 'assistant', content: minjiReply });
-          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
-          localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
-          this.loading = false;
-        } catch (error) {
-          console.error('Error sending chat:', error);
+      } else {
+        if (customContent.trim() !== '') {
+          const newUserMessage = { role: 'user', content: customContent };
+          this.chatHistory.push(newUserMessage);
         }
+      }
+
+      this.loading = true;
+      // https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message
+      try {
+        const response = await axios.post('http://localhost:3000/message', {
+          chatHistory: this.chatHistory,
+        });
+
+        const minjiReply = response.data.reply.choices[0].message.content;
+        this.chatHistory.push({ role: 'assistant', content: minjiReply });
+        this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
+        localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+        this.loading = false;
+      } catch (error) {
+        console.error('Error sending chat:', error);
       }
     },
   },
