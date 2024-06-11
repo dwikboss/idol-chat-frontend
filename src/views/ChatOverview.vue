@@ -29,6 +29,9 @@
           :real-name="idol.real_name"
         />
       </div>
+      <div @click="clearHistory" class="clear-chathistory">
+        click here if your chat is broken (you will lose your chat history tho 😔 )
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +51,12 @@ export default defineComponent({
       idols,
     };
   },
+  methods: {
+    clearHistory() {
+      localStorage.removeItem('chatHistoryDisplay');
+      localStorage.removeItem('chatHistory');
+    }
+  }
 });
 </script>
 
@@ -111,6 +120,18 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .clear-chathistory {
+      margin-top: 25px;
+      background-color: rgb(221, 78, 78);
+      width: 100%;
+      color: white;
+      font-family: 'Times New Roman', Times, serif;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid black;
+      margin-bottom: 0 auto;
+    }
 
     .chat-list {
       width: 100%;
