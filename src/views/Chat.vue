@@ -84,6 +84,7 @@ export default defineComponent({
   },
   mounted() {
     this.loadChatHistory();
+    this.scrollToEnd();
   },
   updated() {
     this.scrollToBottom();
