@@ -122,8 +122,13 @@ export default defineComponent({
       }
     },
     async sendChat(customContent: string) {
-      if (Math.random() < 0.9) {
-        this.voiceEvent = true;
+      if (!this.voiceEvent) {
+        if (Math.random() < 0.9) {
+          this.voiceEvent = true;
+        }
+      } else if (this.voiceMessages > 4) {
+        this.voiceEvent = false;
+        this.voiceMessages = 0;
       }
 
       if (this.input.trim() !== '') {
@@ -136,6 +141,7 @@ export default defineComponent({
 
           this.chatHistory.push(newVoiceMessage);
           this.chatMessages.push(newUserMessage);
+          this.voiceMessages++;
         } else {
           const newUserMessage = { role: 'user', content: this.input };
           this.chatHistory.push(newUserMessage);
@@ -160,8 +166,6 @@ export default defineComponent({
           });
 
           const minjiReply = response.data.reply.choices[0].message.content;
-          if (this.voiceEvent) {
-          }
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
 
           if (this.nextMsgPhoto) {
@@ -172,6 +176,11 @@ export default defineComponent({
               grouped_message: this.nextMessageGroup || false,
             });
             this.nextMsgPhoto = false;
+          } else if (this.voiceEvent) {
+            const prepVoice = JSON.parse(minjiReply);
+            console.log(prepVoice.English);
+            const voiceMessageResponse = await this.fetchVoiceMessage(prepVoice);
+            console.log(voiceMessageResponse);
           } else {
             this.chatMessages.push({
               role: 'assistant',
@@ -213,6 +222,34 @@ export default defineComponent({
       };
 
       await makeRequest();
+    },
+    async fetchVoiceMessage(text: string) {
+      try {
+        const options = {
+          method: 'POST',
+          headers: {
+            'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            voice_settings: {
+              stability: 0.3,
+              similarity_boost: 1,
+              style: 1,
+              use_speaker_boost: true,
+            },
+            text: 'helloooo!!',
+          }),
+        };
+
+        const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8', options);
+        const responseData = await response.json();
+        console.log(responseData);
+        return responseData;
+      } catch (error) {
+        console.error('Failed to fetch voice message:', error);
+        throw error;
+      }
     },
   },
 });
