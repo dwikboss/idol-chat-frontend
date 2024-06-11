@@ -11,12 +11,14 @@
     </div>
     <div class="chat-container">
       <div class="full-width">
-        <div class="chat-area">test</div>
+        <div class="chat-area">
+          <ChatMessage/>
+        </div>
       </div>
     </div>
     <div class="input-area">
       <div class="full-width">
-        <input type="text" />
+        <input @keyup.enter="sendChat" placeholder="Type your message here..." type="text" v-model="input" />
         <button>></button>
       </div>
     </div>
@@ -25,38 +27,69 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import type _Idol from '@/interfaces/_Idol.ts';
-import type _Idols from '@/interfaces/_Idols.ts';
 import idols from '@/assets/data/idols.json';
+import axios from 'axios';
+import ChatMessage from '@/components/ChatMessage.vue';
+import type Idol from '@/interfaces/_IIdol.ts';
+import type Idols from '@/interfaces/_IIdols.ts';
+import type Message from '@/interfaces/_IMessage.ts';
 
 export default defineComponent({
   name: 'Chat',
   data() {
     return {
-      idolData: {} as _Idols,
+      idolData: {} as Idol,
+      chatHistory: [] as any,
+      chatMessages: [] as Message[],
+      input: '',
     };
   },
   mounted() {
     this.fetchIdolData();
-    this.initChatData();
+    this.loadChatHistory();
+  },
+  components: {
+    ChatMessage
   },
   methods: {
+    loadChatHistory() {
+      const history = localStorage.getItem('chatHistory');
+      if (history) {
+        this.chatHistory = JSON.parse(history);
+        console.log(this.chatHistory);
+      }
+    },
     fetchIdolData() {
       const idolName = this.$route.params.idolName as string;
-      if (idolName && (idols as _Idols).hasOwnProperty(idolName)) {
-        this.idolData = (idols as _Idols)[idolName];
+      if (idolName && (idols as Idols).hasOwnProperty(idolName)) {
+        this.idolData = (idols as Idols)[idolName];
       } else {
         this.idolData = { display_name: 'Unknown', profile_picture: 'default.jpg' };
       }
     },
-    initChatData() {
-      
-    }
+    async sendChat() {
+      if (this.input.trim() !== '') {
+        const newUserMessage = { role: 'user', content: this.input };
+        this.chatHistory.push(newUserMessage);
+        this.chatMessages.push(newUserMessage);
+        localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+        this.input = '';
+
+        try {
+          const response = await axios.post('http://localhost:3000/message', {
+            chatHistory: this.chatHistory,
+          });
+
+          const minjiReply = response.data.reply.choices[0].message.content;
+          this.chatHistory.push({ role: 'assistant', content: minjiReply });
+          localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+          console.log(minjiReply);
+        } catch (error) {
+          console.error('Error sending chat:', error);
+        }
+      }
+    },
   },
-  props: {
-    idolName: String,
-  },
-  components: {},
 });
 </script>
 
@@ -146,10 +179,14 @@ export default defineComponent({
         border-radius: 999px;
         padding-left: 15px;
         border: 1px solid rgba(0, 0, 0, 0.082);
-      }
 
-      input:focus {
-        outline: none;
+        &:focus {
+          outline: none;
+        }
+
+        &::placeholder {
+          opacity: 0.5;
+        }
       }
     }
   }
