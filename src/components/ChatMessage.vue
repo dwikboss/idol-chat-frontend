@@ -86,7 +86,7 @@ export default defineComponent({
     }
 
     &.assistant {
-    background-color: #4d4343;
+    background-color: #bf81a4;
       border-radius: 10px 10px 10px 0px;
     }
   }
