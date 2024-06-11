@@ -15,6 +15,7 @@
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
     </div>
     <div class="input-area">
+      <button @click="fetchVoiceMessage('hi everyone!')">Download Voice Message</button>
       <div class="full-width">
         <input
           @keyup.enter="sendChat('')"
@@ -59,6 +60,8 @@ export default defineComponent({
   mounted() {
     this.fetchIdolData();
     this.loadChatHistory();
+
+    this.fetchVoiceMessage('lol');
   },
   updated() {
     this.$nextTick(() => this.scrollToEnd());
@@ -225,30 +228,37 @@ export default defineComponent({
     },
     async fetchVoiceMessage(text: string) {
       try {
-        const options = {
-          method: 'POST',
+        const response = await axios({
+          method: 'post',
+          url: 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8',
           headers: {
             'xi-api-key': '1f6c178eb0662924d98bf8293241c540',
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
+          data: {
             voice_settings: {
               stability: 0.3,
               similarity_boost: 1,
               style: 1,
               use_speaker_boost: true,
             },
-            text: 'helloooo!!',
-          }),
-        };
+            text: text,
+          },
+          responseType: 'blob', // Set responseType to 'blob' for handling binary data
+        });
 
-        const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8', options);
-        const responseData = await response.json();
-        console.log(responseData);
-        return responseData;
+        // Create a URL for the blob
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'voiceMessage.mp3'); // Name the download file
+        document.body.appendChild(link);
+        link.click();
+        if (link.parentNode) {
+          link.parentNode.removeChild(link);
+        }
       } catch (error) {
         console.error('Failed to fetch voice message:', error);
-        throw error;
       }
     },
   },
