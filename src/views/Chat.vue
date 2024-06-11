@@ -164,7 +164,7 @@ export default defineComponent({
     gap: 20px;
     flex-direction: column;
     height: 0;
-    overflow: scroll;
+    overflow: auto;
     justify-content: flex-start;
 
     & > :first-child {
