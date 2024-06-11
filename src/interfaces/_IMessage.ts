@@ -4,4 +4,5 @@ export default interface Message {
   content_KR?: string;
   media?: string;
   grouped_message?: boolean;
+  voice?: string;
 }
