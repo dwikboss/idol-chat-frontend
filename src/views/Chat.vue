@@ -25,9 +25,9 @@ import { defineComponent } from 'vue';
 import idols from '@/assets/data/idols.json';
 import axios from 'axios';
 import ChatMessage from '@/components/ChatMessage.vue';
-import type Idol from '@/interfaces/_IIdol.ts';
-import type Idols from '@/interfaces/_IIdols.ts';
-import type Message from '@/interfaces/_IMessage.ts';
+import type Idol from '@/interfaces/_IIdol';
+import type Idols from '@/interfaces/_IIdols';
+import type Message from '@/interfaces/_IMessage';
 
 export default defineComponent({
   name: 'Chat',
@@ -67,10 +67,11 @@ export default defineComponent({
     },
     fetchIdolData() {
       const idolName = this.$route.params.idolName as string;
-      if (idolName && (idols as Idols).hasOwnProperty(idolName)) {
-        this.idolData = (idols as Idols)[idolName];
+      const idol = idols.find(idol => idol.id === idolName);
+      if (idol) {
+          this.idolData = idol;
       } else {
-        this.idolData = { display_name: 'Unknown', profile_picture: 'default.jpg' };
+          this.idolData = { id: 'unknown', display_name: 'Unknown', profile_picture: 'default.jpg' };
       }
     },
     async sendChat() {

@@ -1,10 +1,12 @@
-{
-    "minji": {
+[
+    {
+        "id": "minji",
         "display_name": "✨민지✨",
         "profile_picture": "minji.jpg"
     },
-    "yujin": {
+    {
+        "id": "yujin",
         "display_name": "유진 🐶",
         "profile_picture": "yujin.jpg"
     }
-}  
+]
