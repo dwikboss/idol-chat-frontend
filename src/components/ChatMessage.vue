@@ -74,18 +74,19 @@ export default defineComponent({
   }
 
   .message-bubble {
-    background-color: rgb(179, 34, 123);
     padding: 10px;
     color: white;
     font-family: 'Roboto';
 
     &.user {
+    background-color: rgb(179, 34, 123);
       border-radius: 10px 10px 0 10px;
       margin-left: auto;
       max-width: 75%;
     }
 
     &.assistant {
+    background-color: #4d4343;
       border-radius: 10px 10px 10px 0px;
     }
   }
