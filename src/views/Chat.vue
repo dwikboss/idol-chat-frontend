@@ -24,7 +24,7 @@
         <img src="/images/profile_pictures/minji.jpg" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>✨민지✨</h4>
-          <p v-if="loading">Typing...</p>
+          <p v-if="loading">{{ typeMessage }}</p>
           <p v-else>Online</p>
         </div>
         <div class="settings-btn" @click="openSettings">
@@ -90,6 +90,11 @@ export default defineComponent({
   },
   components: {
     ChatMessage,
+  },
+  computed: {
+    typeMessage() {
+      return this.voiceEvent ? 'Recording voice message...' : 'Typing...'
+    }
   },
   methods: {
     scrollToBottom() {
