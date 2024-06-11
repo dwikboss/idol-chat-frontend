@@ -31,7 +31,7 @@
         />
       </div>
       <div @click="clearHistory" class="clear-chathistory">
-        click here if your chat is broken (you will lose your chat history tho 😔 )
+        click here if your chat is broken (you will lose your chat history tho 😔)
       </div>
     </div>
   </div>
@@ -59,6 +59,7 @@ export default defineComponent({
         text = 'Chat history deleted';
         localStorage.removeItem('chatHistoryDisplay');
         localStorage.removeItem('chatHistory');
+        localStorage.removeItem('photoSent');
       } else {
         text = 'Aborted';
       }
