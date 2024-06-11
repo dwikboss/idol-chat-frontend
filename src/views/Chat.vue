@@ -154,6 +154,9 @@ export default defineComponent({
     padding-top: 20px;
     background-color: white;
     filter: drop-shadow(0px 0px 3px #0000001f);
+    position: fixed;
+    width: 100%;
+    top: 0;
 
     .full-width {
       width: 100%;
@@ -184,7 +187,7 @@ export default defineComponent({
     display: flex;
     flex-grow: 1;
     padding-top: 15px;
-    padding-bottom: 15px;
+    padding-bottom: calc(10vh + 20px);
     width: 100%;
     gap: 20px;
     flex-direction: column;
@@ -198,16 +201,21 @@ export default defineComponent({
   }
 
   .input-area {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
     padding: 15px 0 15px 0;
     display: flex;
     gap: 15px;
     background-color: white;
     filter: drop-shadow(0px 0px 3px #0000001f);
+    height: 10vh;
 
     .full-width {
       width: 100%;
       display: flex;
       gap: 15px;
+      align-items: center;
 
       button {
         border-radius: 50%;
