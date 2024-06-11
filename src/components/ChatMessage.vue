@@ -15,7 +15,7 @@ export default defineComponent({
   data() {
     return {
       translated: false as boolean,
-    }
+    };
   },
   props: {
     chat: {
@@ -25,12 +25,8 @@ export default defineComponent({
   },
   computed: {
     formatMessage() {
-      if (this.chat.role == 'assistant') {
-        if (this.translated) {
-          return this.chat.content.Korean;
-        } else {
-          return this.chat.content.English;
-        }
+      if (this.chat.role === 'assistant') {
+        return this.translated ? this.chat.content.English : this.chat.content.Korean;
       } else {
         return this.chat.content;
       }
@@ -39,8 +35,8 @@ export default defineComponent({
   methods: {
     translate() {
       this.translated = !this.translated;
-    }
-  }
+    },
+  },
 });
 </script>
 
@@ -77,16 +73,17 @@ export default defineComponent({
     padding: 10px;
     color: white;
     font-family: 'Roboto';
+    max-width: 65%;
 
     &.user {
-    background-color: rgb(179, 34, 123);
+      background-color: rgb(179, 34, 123);
       border-radius: 10px 10px 0 10px;
       margin-left: auto;
       max-width: 75%;
     }
 
     &.assistant {
-    background-color: #bf81a4;
+      background-color: #bf81a4;
       border-radius: 10px 10px 10px 0px;
     }
   }
