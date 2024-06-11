@@ -2,6 +2,7 @@
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
+
         <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>{{ idolData.display_name }}</h4>
@@ -15,7 +16,8 @@
     </div>
     <div class="input-area">
       <div class="full-width">
-        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input" ref="inputField" />
+        <input @keyup.enter="sendChat('')" placeholder="Type your message here..." type="text" v-model="input"
+          ref="inputField" />
       </div>
     </div>
   </div>
@@ -41,6 +43,8 @@ export default defineComponent({
       loading: false as boolean,
       sendChatCount: 0,
       userSentLast: false,
+      retryCount: 0,
+      maxRetries: 3
     };
   },
   mounted() {
@@ -105,38 +109,45 @@ export default defineComponent({
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
         this.input = '';
-        const inputElement = this.$refs.inputField as HTMLInputElement;
-        inputElement.blur();
-      } else {
-        if (customContent.trim() !== '') {
-          this.userSentLast = false;
-          const newUserMessage = { role: 'user', content: customContent };
-          this.chatHistory.push(newUserMessage);
-        }
+        
+        (this.$refs.inputField as HTMLInputElement).blur();
+      } else if (customContent.trim() !== '') {
+        this.userSentLast = false;
+        const newUserMessage = { role: 'user', content: customContent };
+        this.chatHistory.push(newUserMessage);
       }
 
       this.loading = true;
 
-      try {
-        const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
-          chatHistory: this.chatHistory,
-        });
+      const makeRequest = async () => {
+        try {
+          const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
+            chatHistory: this.chatHistory,
+          });
 
-        const minjiReply = response.data.reply.choices[0].message.content;
-        this.chatHistory.push({ role: 'assistant', content: minjiReply });
-        this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
-        localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+          const minjiReply = response.data.reply.choices[0].message.content;
+          this.chatHistory.push({ role: 'assistant', content: minjiReply });
+          this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
+          localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
 
-        if (this.userSentLast) {
-          if (Math.random() < 0.3) {
+          if (this.userSentLast && Math.random() < 0.3) {
             this.initBotConversation();
           }
+          this.loading = false;
+          this.retryCount = 0; // Reset retries on success
+        } catch (error) {
+          console.error('Error sending chat:', error);
+          if (this.retryCount < this.maxRetries) {
+            this.retryCount++;
+            setTimeout(makeRequest, 2000); // Retry after 2 seconds
+          } else {
+            this.loading = false;
+            console.error('Max retries reached. Giving up.');
+          }
         }
+      };
 
-        this.loading = false;
-      } catch (error) {
-        console.error('Error sending chat:', error);
-      }
+      await makeRequest();
     },
   },
 });
@@ -198,7 +209,7 @@ export default defineComponent({
     overflow: auto;
     justify-content: flex-start;
 
-    & > :first-child {
+    &> :first-child {
       margin-top: auto;
     }
   }
