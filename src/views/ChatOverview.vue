@@ -8,12 +8,12 @@
           <h2>
             <span style="font-family: Helvetica, sans-serif; font-weight: 500">M</span
             ><span style="font-family: Briem Hand, cursive; font-weight: 200; font-style: italic">e</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 700; margin-left: 6px">S</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 200">S</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 500; margin-left: 6px; font-size: 1.6rem;">S</span
+            ><span style="font-family: Helvetica, sans-serif; font-weight: 200; font-size: 1.6rem;">S</span
             ><span style="font-family: Lora, serif; font-weight: 500">a</span
             ><span style="font-family: Helvetica, sans-serif; font-weight: 500">g</span
             ><span style="font-family: Briem Hand, cursive; font-weight: 500">e</span
-            ><span style="font-family: Helvetica, sans-serif; font-weight: 500">s</span>
+            ><span style="font-family: Times New Roman, serif; font-weight: 500; font-size: 2.5rem;">s</span>
           </h2>
         </div>
       </div>
