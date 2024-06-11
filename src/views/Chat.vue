@@ -354,7 +354,6 @@ export default defineComponent({
     flex-grow: 1;
     padding-top: calc(82px + 20px);
     padding-bottom: calc(82px + 20px);
-    padding-bottom: 20px;
     width: 100%;
     flex-direction: column;
     height: 0;
