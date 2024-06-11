@@ -38,9 +38,9 @@ export default defineComponent({
     },
     translateBg() {
       if (this.translated == true) {
-        return '#808080';
+        return '#c85887';
       } else {
-        return '#1040CA';
+        return '#808080';
       }
     }
   },
