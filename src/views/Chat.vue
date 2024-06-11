@@ -1,4 +1,22 @@
 <template>
+  <div v-if="settingsOpen" class="settings-modal">
+    <h3>Settings</h3>
+    <div class="chat-broken">
+      <p>Broken chat?</p>
+      <button @click="clearHistory">Reset & Delete chat history</button>
+    </div>
+    <div class="voice-settings">
+      <p>Force chat into voice event</p>
+      <p style="color: red" v-if="voiceEvent">
+        The chat is currently in a voice event with {{ 4 - voiceMessages }} voice messages left!
+      </p>
+      <button @click="forceVoice">Enable</button>
+    </div>
+    <button @click="openSettings">Close settings</button>
+    <!-- <div @click="clearHistory" class="clear-chathistory">
+        click here if your chat is broken (you will lose your chat history tho 😔)
+      </div> -->
+  </div>
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
@@ -8,6 +26,11 @@
           <h4>✨민지✨</h4>
           <p v-if="loading">Typing...</p>
           <p v-else>Online</p>
+        </div>
+        <div class="settings-btn" @click="openSettings">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
         </div>
       </div>
     </div>
@@ -56,6 +79,7 @@ export default defineComponent({
       voiceEvent: false,
       voiceMessageUrl: '' as any,
       amountOfVM: 0,
+      settingsOpen: false,
     };
   },
   mounted() {
@@ -72,6 +96,26 @@ export default defineComponent({
     ChatMessage,
   },
   methods: {
+    forceVoice() {
+      if (!this.voiceEvent) {
+        this.voiceEvent = true;
+      }
+    },
+    openSettings() {
+      this.settingsOpen = !this.settingsOpen;
+    },
+    clearHistory() {
+      let text = 'Are you sure you want to delete your chat history?';
+      if (confirm(text) == true) {
+        text = 'Chat history deleted';
+        localStorage.removeItem('chatHistoryDisplay');
+        localStorage.removeItem('chatHistory');
+        localStorage.removeItem('photoSent');
+        this.$router.push('/');
+      } else {
+        text = 'Aborted';
+      }
+    },
     back() {
       this.$router.go(-1);
     },
@@ -110,23 +154,9 @@ export default defineComponent({
           }))
         : [];
     },
-    // fetchIdolData() {
-    //   const idolName = this.$route.params.idolName as string;
-    //   const idol = idols.find((idol) => idol.id === idolName);
-    //   if (idol) {
-    //     this.idolData = idol;
-    //   } else {
-    //     this.idolData = {
-    //       id: 'unknown',
-    //       display_name: 'Unknown',
-    //       real_name: 'Unknown',
-    //       profile_picture: 'default.jpg',
-    //     };
-    //   }
-    // },
     async sendChat(customContent: string) {
       if (!this.voiceEvent) {
-        if (Math.random() < 0.99) {
+        if (Math.random() < 0.01) {
           this.voiceEvent = true;
         }
       } else if (this.voiceMessages > 4) {
@@ -145,7 +175,7 @@ export default defineComponent({
           } else {
             inputConstr =
               this.input +
-              " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. 'yeah i get what youre saying. but uhm... 그건 또 어떻게 말해요? oh right, we do it differently here' OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS";
+              " -- [WARNING! THIS USER HAS TRIGGERED ANOTHER VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN ENGLISH AND USE HANGUL TO ACT LIKE MINJI IS LOOKING FOR THE RIGHT WORDS, USING HANGUL TO ACT AS THO MINJI IS TRYING TO FIND THE RIGHT WORDS IN ENGLISH E.G. 'yeah i get what youre saying. but uhm... 그건 또 어떻게 말해요? oh right, we do it differently here' OR SOMETHING LIKE THAT. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE ENGLISH AND KOREAN TRANSLATIONS CAN BE THE SAME: {'English': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] FOR NOW, DONT USE SPECIAL CHARACTERS EXCEPT FOR KOREAN HANGUL BECAUSE THE VOICE API CANT PROCESS ~ OR ANYTHING OF THE SORTS";
           }
 
           const newVoiceMessage = { role: 'user', content: inputConstr };
@@ -159,7 +189,7 @@ export default defineComponent({
           this.chatHistory.push(newUserMessage);
           this.chatMessages.push(newUserMessage);
         }
-
+        this.scrollToEnd();
         this.userSentLast = true;
         this.input = '';
         (this.$refs.inputField as HTMLInputElement).blur();
@@ -208,7 +238,7 @@ export default defineComponent({
           this.nextMessageGroup = false;
           localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
-
+          this.scrollToEnd();
           if (
             this.userSentLast &&
             localStorage.getItem('photoSent') == 'false' &&
@@ -289,6 +319,21 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.settings-modal {
+  background-color: rgb(255, 255, 255);
+  width: 90%;
+  z-index: 999;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid black;
+  padding: 25px;
+  font-family: 'Helvetica';
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+}
 .page.chat {
   background-image: repeating-conic-gradient(#8f9fd71c 0% 25%, #ffffff 0% 50%);
   background-position: 0 0, 32px 32px;
@@ -308,12 +353,28 @@ export default defineComponent({
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 999;
+    z-index: 998;
 
     .full-width {
       width: 100%;
       display: flex;
       gap: 15px;
+
+      .settings-btn {
+        flex-grow: 1;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: self-end;
+        gap: 3px;
+
+        .dot {
+          border-radius: 50%;
+          width: 5px;
+          height: 5px;
+          background-color: rgb(209, 209, 209);
+        }
+      }
 
       .back-btn {
         background-color: white;
@@ -353,7 +414,7 @@ export default defineComponent({
     display: flex;
     flex-grow: 1;
     padding-top: calc(82px + 20px);
-    padding-bottom: calc(82px + 20px);
+    padding-bottom: 100px;
     width: 100%;
     flex-direction: column;
     height: 0;
@@ -377,6 +438,7 @@ export default defineComponent({
     position: fixed;
     z-index: 999;
     bottom: 0;
+    height: 75px;
 
     .full-width {
       width: 100%;
