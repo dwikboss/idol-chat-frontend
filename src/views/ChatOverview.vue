@@ -110,7 +110,7 @@ export default defineComponent({
   }
 
   .minji-sb {
-    width: 105%;
+    height: 72vh;
     position: fixed;
     bottom: 0;
     right: 0;
@@ -120,7 +120,7 @@ export default defineComponent({
 
   @media (min-width: 992px) {
     .minji-sb {
-      width: 25vw;
+      // width: 25vw;
     }
   }
 
