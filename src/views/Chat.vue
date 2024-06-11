@@ -13,7 +13,6 @@
     </div>
     <div class="chat-container full-width">
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
-      <audio v-if="voiceMessageUrl" controls :src="voiceMessageUrl"></audio>
     </div>
     <div class="input-area">
       <div class="full-width">
