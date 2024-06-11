@@ -34,7 +34,7 @@ export default defineComponent({
   },
   data() {
     return {
-      idols
+      idols,
     };
   },
   methods: {
@@ -57,6 +57,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@media (min-width: 992px) {
+  .nwjns-logo {
+    width: 20vw !important;
+  }
+}
+
 .page.overview {
   background: rgb(118, 138, 195);
   background: linear-gradient(180deg, rgba(118, 138, 195, 1) 0%, rgba(255, 255, 255, 1) 100%);
@@ -89,8 +95,8 @@ export default defineComponent({
         .nwjns-logo {
           width: 90%;
           margin-top: 75px;
-
           animation: tilt-logo 2s linear infinite;
+          z-index: 999;
         }
 
         h2 {
@@ -104,11 +110,18 @@ export default defineComponent({
   }
 
   .minji-sb {
-    width: 120%;
+    width: 105%;
     position: fixed;
     bottom: 0;
     right: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  @media (min-width: 992px) {
+    .minji-sb {
+      width: 25vw;
+    }
   }
 
   .bunny {
@@ -160,6 +173,8 @@ export default defineComponent({
         font-family: Helvetica;
         font-size: 24px;
         text-align: center;
+        color: black;
+        text-decoration: none;
       }
     }
   }
