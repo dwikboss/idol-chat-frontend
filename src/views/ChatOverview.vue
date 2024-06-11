@@ -9,15 +9,10 @@
       </div>
     </div>
     <img class="minji-sb" src="/images/minji-sb.png" alt="minji" />
-    <!-- <img  class="minji-sb" src="/images/minji-home.png" alt="minji" /> -->
-    <!-- <img class="bunny" src="/images/bunny.png" alt="bunny" /> -->
     <div class="full-width home-splash">
       <div class="chat-list">
         <button class="chat-button" @click="openChat()">Open chat!</button>
       </div>
-      <!-- <div @click="clearHistory" class="clear-chathistory">
-        click here if your chat is broken (you will lose your chat history tho 😔)
-      </div> -->
     </div>
   </div>
 </template>
