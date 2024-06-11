@@ -3,16 +3,16 @@
     <h3>Settings</h3>
     <div class="chat-broken">
       <p>Broken chat?</p>
-      <button @click="clearHistory">Reset & Delete chat history</button>
+      <button class="settings-button" @click="clearHistory">Reset & Delete chat history</button>
     </div>
     <div class="voice-settings">
       <p>Force chat into voice event</p>
       <p style="color: red" v-if="voiceEvent">
         The chat is currently in a voice event with {{ 4 - voiceMessages }} voice messages left!
       </p>
-      <button @click="forceVoice">Enable</button>
+      <button class="settings-button" @click="forceVoice">Enable</button>
     </div>
-    <button @click="openSettings">Close settings</button>
+    <button class="close-button" @click="openSettings">Close settings</button>
     <!-- <div @click="clearHistory" class="clear-chathistory">
         click here if your chat is broken (you will lose your chat history tho 😔)
       </div> -->
@@ -343,7 +343,22 @@ export default defineComponent({
   gap: 20px;
   display: flex;
   flex-direction: column;
+
+  .settings-button {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
+    border: 1px solid black;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  .close-button {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(228, 31, 24) 100%);
+    border: 1px solid black;
+    font-size: 16px;
+  }
+
 }
+
 .page.chat {
   background-image: repeating-conic-gradient(#8f9fd71c 0% 25%, #ffffff 0% 50%);
   background-position: 0 0, 32px 32px;
