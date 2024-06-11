@@ -72,7 +72,7 @@ export default defineComponent({
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 8px;
+      padding: 8px 8px 0 8px;
       height: 30px;
       width: 38px;
       border-radius: 50%;
