@@ -4,10 +4,11 @@
       <img :src="`/images/profile_pictures/${idol.profile_picture}`" alt="pfp" />
     </div>
     <div class="message-bubble" :class="chat.role">
-      <p>{{ formatMessage }}</p>
+      <p v-if="!chat.voice">{{ formatMessage }}</p>
+      <audio v-if="chat.voice" controls :src="chat.voice"></audio>
       <img v-if="chat.media" :src="`/images/minji_pics/${chat.media}`" alt="pic_minji">
     </div>
-    <div @click="translate" class="translate-btn">
+    <div v-if="!chat.voice" @click="translate" class="translate-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
         <path
           :fill="translateBg"
