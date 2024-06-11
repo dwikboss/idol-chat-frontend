@@ -56,7 +56,7 @@ export default defineComponent({
   methods: {
     initBotConversation() {
       this.sendChat(
-        '-1-Can you talk about what you just said a bit more? Continue that part of the conversation in no more than 4 words. You can also react a bit more on what you just said.'
+        '-1-Continue that part of the conversation of what you just said in no more than 4 words. You can also react a bit more on what you just said.'
       );
     },
     scrollToEnd() {
@@ -127,7 +127,6 @@ export default defineComponent({
 
         if (this.userSentLast) {
           if (Math.random() < 0.3) {
-            console.log(Math.random());
             this.initBotConversation();
           }
         }
