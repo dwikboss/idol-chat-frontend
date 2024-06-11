@@ -64,6 +64,7 @@ export default defineComponent({
       const history = localStorage.getItem('chatHistory');
       if (history) {
         let parsedHistory = JSON.parse(history);
+        this.chatHistory = JSON.parse(history);
         this.chatMessages = parsedHistory.map((message: any) => {
           if (message.role === 'assistant' && typeof message.content === 'string') {
             try {
@@ -74,7 +75,6 @@ export default defineComponent({
           }
           return message;
         });
-        console.log(this.chatMessages);
       }
     },
     fetchIdolData() {
@@ -89,13 +89,13 @@ export default defineComponent({
     async sendChat() {
       if (this.input.trim() !== '') {
         const newUserMessage = { role: 'user', content: this.input };
+        console.log(this.chatHistory);
         this.chatHistory.push(newUserMessage);
         this.chatMessages.push(newUserMessage);
-        console.log(this.chatMessages);
-        localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
-        this.input = '';
 
+        this.input = '';
         this.loading = true;
+
         try {
           const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
             chatHistory: this.chatHistory,
@@ -103,9 +103,8 @@ export default defineComponent({
 
           const minjiReply = response.data.reply.choices[0].message.content;
           this.chatHistory.push({ role: 'assistant', content: minjiReply });
-          localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
-          console.log(this.chatMessages);
+          localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
           this.loading = false;
         } catch (error) {
           console.error('Error sending chat:', error);
