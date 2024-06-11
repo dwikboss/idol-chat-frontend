@@ -75,7 +75,7 @@ export default defineComponent({
     initBotConversation() {
       if (this.usedMessages.size < this.randomMessages.length) {
         let randomIndex;
-        
+
         do {
           randomIndex = Math.floor(Math.random() * this.randomMessages.length);
         } while (this.usedMessages.has(randomIndex));
@@ -143,7 +143,7 @@ export default defineComponent({
       this.loading = true;
       // https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message
       try {
-        const response = await axios.post('http://localhost:3000/message', {
+        const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
           chatHistory: this.chatHistory,
         });
 
