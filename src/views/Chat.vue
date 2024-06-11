@@ -444,7 +444,6 @@ export default defineComponent({
         height: 50px;
         border-radius: 50%;
         border: 1px solid black;
-        border: 1px solid black;
       }
     }
   }
