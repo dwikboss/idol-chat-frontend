@@ -2,7 +2,6 @@
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
-
         <img :src="`/images/profile_pictures/${idolData.profile_picture}`" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>{{ idolData.display_name }}</h4>
@@ -44,7 +43,7 @@ export default defineComponent({
       sendChatCount: 0,
       userSentLast: false,
       retryCount: 0,
-      maxRetries: 3
+      maxRetries: 5
     };
   },
   mounted() {
@@ -134,12 +133,12 @@ export default defineComponent({
             this.initBotConversation();
           }
           this.loading = false;
-          this.retryCount = 0; // Reset retries on success
+          this.retryCount = 0;
         } catch (error) {
           console.error('Error sending chat:', error);
           if (this.retryCount < this.maxRetries) {
             this.retryCount++;
-            setTimeout(makeRequest, 2000); // Retry after 2 seconds
+            setTimeout(makeRequest, 2000);
           } else {
             this.loading = false;
             console.error('Max retries reached. Giving up.');
