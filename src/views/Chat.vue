@@ -116,7 +116,7 @@ export default defineComponent({
       this.loading = true;
 
       try {
-        const response = await axios.post('https://idol-chat-backend-git-main-dwikys-projects.vercel.app/message', {
+        const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
           chatHistory: this.chatHistory,
         });
 
@@ -126,7 +126,7 @@ export default defineComponent({
         localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
 
         if (this.userSentLast) {
-          if (Math.random() < 0.16) {
+          if (Math.random() < 0.20) {
             console.log('Triggering additional bot conversation');
             this.initBotConversation();
           }
