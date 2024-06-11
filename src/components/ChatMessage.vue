@@ -5,6 +5,7 @@
     </div>
     <div class="message-bubble" :class="chat.role">
       <p>{{ formatMessage }}</p>
+      <img v-if="chat.media" :src="`/images/minji_pics/${chat.media}`" alt="pic_minji">
     </div>
     <div @click="translate" class="translate-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
@@ -70,7 +71,7 @@ export default defineComponent({
 .message-info {
   width: 30px;
   height: 30px;
-  margin-right: 5px;
+  margin-right: 10px;
   align-self: flex-start;
 
   img {
@@ -113,6 +114,11 @@ export default defineComponent({
     color: white;
     font-family: 'Roboto';
     max-width: 65%;
+
+    img {
+      width: 100%;
+      margin-top: 5px;
+    }
 
     &.user {
       background: rgb(255, 255, 255);
