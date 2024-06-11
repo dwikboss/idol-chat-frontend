@@ -116,6 +116,7 @@ export default defineComponent({
     right: 0;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 998;
   }
 
   @media (min-width: 992px) {
@@ -175,6 +176,7 @@ export default defineComponent({
         text-align: center;
         color: black;
         text-decoration: none;
+        z-index: 999;
       }
     }
   }
