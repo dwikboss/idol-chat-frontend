@@ -24,7 +24,11 @@
   <div class="page chat">
     <div class="overview-header">
       <div class="full-width">
-        <div class="back-btn" @click="back">&#60;</div>
+        <div class="back-btn" @click="back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <img src="/images/profile_pictures/minji.jpg" alt="Profile Picture" />
         <div class="chat-header-text">
           <h4>✨민지✨</h4>
@@ -50,7 +54,12 @@
           v-model="input"
           ref="inputField"
         />
-        <button @click="sendChat('')">send</button>
+        <button @click="sendChat('')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -85,6 +94,12 @@ export default defineComponent({
       amountOfVM: 0,
       settingsOpen: false,
       imageChance: 0.25,
+      availableImages: [
+        'minji_food_1.jpeg',
+        'minji_food_2.jpeg',
+        'minji_selfie_1.jpg',
+        'album.png'
+      ],
     };
   },
   mounted() {
@@ -106,6 +121,10 @@ export default defineComponent({
     }
   },
   methods: {
+    getRandomImage() {
+      const randomIndex = Math.floor(Math.random() * this.availableImages.length);
+      return this.availableImages[randomIndex];
+    },
     scrollToBottom() {
       this.$nextTick(() => {
         const container = this.$refs.chatContainer as HTMLDivElement;
@@ -237,7 +256,7 @@ export default defineComponent({
             this.chatMessages.push({
               role: 'assistant',
               content: JSON.parse(minjiReply),
-              media: 'minji_food_1.jpeg',
+              media: this.getRandomImage(),
               grouped_message: this.nextMessageGroup || false,
             });
             this.nextMsgPhoto = false;
@@ -373,13 +392,11 @@ export default defineComponent({
 }
 
 .page.chat {
-  background-image: repeating-conic-gradient(#8f9fd71c 0% 25%, #ffffff 0% 50%);
-  background-position: 0 0, 32px 32px;
-  background-size: 64px 64px;
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 100vh;
 
   .overview-header {
     display: flex;
@@ -415,16 +432,33 @@ export default defineComponent({
       }
 
       .back-btn {
-        background-color: white;
-        width: 25px;
-        height: 25px;
+        background: white;
+        width: 40px;
+        height: 40px;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: black;
-        border: 1px solid black;
+        color: #374151;
+        border: 1px solid #e5e7eb;
         border-radius: 50%;
         align-self: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 18px;
+        font-weight: 500;
+        
+        &:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+          transform: translateY(-1px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
       }
 
       .chat-header-text {
@@ -467,47 +501,80 @@ export default defineComponent({
 
   .input-area {
     width: 100%;
-    padding: 15px 0 15px 0;
     display: flex;
-    gap: 15px;
-    border-top: 1px solid black;
-    filter: drop-shadow(0px 0px 3px #0000001f);
-    background-color: rgb(255, 255, 255);
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
     position: fixed;
     z-index: 999;
     bottom: 0;
-    height: 75px;
+    height: 80px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 
     .full-width {
       width: 100%;
       display: flex;
-      gap: 15px;
+      gap: 12px;
       align-items: center;
 
       button {
-        border-style: inset;
-        height: 100%;
-        font-family: 'Times New Roman', Times, serif;
-        width: 15%;
-        font-size: 16px;
-        background: rgb(255, 255, 255);
-        background: linear-gradient(180deg, rgb(255, 255, 255) 0%, rgb(88 154 255) 100%);
-        color: black;
+        height: 48px;
+        width: 48px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        svg {
+          transition: transform 0.2s ease;
+        }
+        
+        &:hover svg {
+          transform: scale(1.1);
+        }
       }
 
       input {
-        height: 44px;
+        height: 48px;
         flex-grow: 1;
-        padding-left: 15px;
-        border-style: inset;
-        border-radius: 0px;
+        padding: 0 20px;
+        border: 2px solid #e5e7eb;
+        border-radius: 999px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 15px;
+        background: white;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
         &:focus {
           outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         &::placeholder {
-          opacity: 0.5;
+          color: #9ca3af;
+          font-weight: 400;
         }
       }
     }
