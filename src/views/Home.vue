@@ -29,7 +29,7 @@ export default defineComponent({
     height: 100%;
 
     .logo {
-      max-width: 200px;
+      max-width: 20h;
     }
   }
 

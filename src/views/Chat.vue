@@ -29,9 +29,9 @@
             <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-        <img src="/images/profile_pictures/minji.jpg" alt="Profile Picture" />
+        <img src="/images/profile_pictures/yuni-sharapfp.jpg" alt="Profile Picture" />
         <div class="chat-header-text">
-          <h4>✨민지✨</h4>
+          <h4>Yuni Shara</h4>
           <p v-if="loading">{{ typeMessage }}</p>
           <p v-else>Online</p>
         </div>
@@ -67,7 +67,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import idols from '@/assets/data/idols.json';
+// import idols from '@/assets/data/idols.json';
 import axios from 'axios';
 import ChatMessage from '@/components/ChatMessage.vue';
 import type Idol from '@/interfaces/_IIdol';
@@ -95,10 +95,13 @@ export default defineComponent({
       settingsOpen: false,
       imageChance: 0.25,
       availableImages: [
-        'minji_food_1.jpeg',
-        'minji_food_2.jpeg',
-        'minji_selfie_1.jpg',
-        'album.png'
+        'image.jpg',
+        'image2.jpg',
+        'image3.jpg',
+        'image4.jpg',
+        'image5.jpg',
+        'image6.jpg',
+        'image7.jpg',
       ],
     };
   },
@@ -162,7 +165,7 @@ export default defineComponent({
     initBotConversation(type: string) {
       if (type == 'photo') {
         this.sendChat(
-          '-1-Act as tho you want to show the user something real quick. You just got coffee. Say something like "oh btw, look i just got coffee" or something along the lines of that. Say it in the style of how Minji would talk! Btw, on the front end, i will inject a pic of minji with a coffee so the user will see a pic with your message so talk accordingly if the user talks about it further.'
+          '-1-Act as tho you want to show the user something real quick. Its a random picture from a vacation in indonesia that was taken by the user, it acts like a kind of memory of the user. On the front-end the user will now see a picture of you.'
         );
       } else {
         this.sendChat(

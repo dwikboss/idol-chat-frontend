@@ -1,7 +1,7 @@
 <template>
   <div class="bubble-wrapper" :class="chat.role">
     <div class="message-info" v-if="chat.role != 'user'" :class="chat.grouped_message ? 'transparent' : ''">
-      <img src="/images/profile_pictures/minji.jpg" alt="pfp" />
+      <img src="/images/profile_pictures/yuni-sharapfp.jpg" alt="pfp" />
     </div>
     <div v-if="chat.role === 'assistant'" class="message-content">
       <div class="message-bubble" :class="[chat.role, audio]">
@@ -77,7 +77,7 @@ export default defineComponent({
       }
     },
     copyButtonText(): string {
-      return this.copied ? 'Copied!' : 'Copy';
+      return this.copied;
     },
   },
   methods: {

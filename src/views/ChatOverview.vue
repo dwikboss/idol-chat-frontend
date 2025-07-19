@@ -1,14 +1,12 @@
 <template>
   <div class="page overview">
-    <div class="dot-overlay"></div>
     <div class="overview-header">
       <div class="full-width">
         <div class="msg-logo">
-          <img class="nwjns-logo" src="/images/minji-chat-logo.png" alt="nwjns logo" />
+          <h1>Yuni Shara</h1>
         </div>
       </div>
     </div>
-    <img class="minji-sb" src="/images/minji-sb.png" alt="minji" />
     <div class="full-width home-splash">
       <div class="chat-list">
         <button class="chat-button" @click="openChat()">Open chat!</button>
@@ -59,11 +57,22 @@ export default defineComponent({
 }
 
 .page.overview {
-  background: rgb(118, 138, 195);
-  background: linear-gradient(180deg, rgba(118, 138, 195, 1) 0%, rgba(255, 255, 255, 1) 100%);
+  background: rgb(226, 26, 26);
+  background: linear-gradient(180deg, rgb(226, 93, 93) 0%, rgba(255, 255, 255, 1) 100%);
   height: 100vh;
   overflow: hidden;
   position: relative;
+  background-position: center center;
+  background-image: url('/images/profile_pictures/yuni-sharapfp.jpg');
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(226, 93, 93, 0.637) 0%, rgba(255, 255, 255, 0.623) 100%);
+  }
 
   .dot-overlay {
     background-image: radial-gradient(#ffffff 1.5px, transparent 1.5px);
@@ -93,6 +102,16 @@ export default defineComponent({
           margin-top: 75px;
           animation: tilt-logo 2s linear infinite;
           z-index: 999;
+        }
+
+        h1 {
+          color: #ffffff;
+          font-size: 4rem;
+          text-transform: uppercase;
+          font-weight: 900;
+          letter-spacing: 5px;
+          color: white;
+          line-height: 1;
         }
 
         h2 {
@@ -142,7 +161,6 @@ export default defineComponent({
       font-family: 'Times New Roman', Times, serif;
       text-align: center;
       padding: 5px;
-      border: 1px solid black;
       margin-bottom: 0 auto;
     }
 
@@ -153,16 +171,15 @@ export default defineComponent({
       gap: 15px;
 
       .chat-button {
-        background: rgb(255, 255, 255);
-        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(125, 232, 6, 1) 100%);
-        padding: 10px 25px 10px 25px;
+        background-color: rgb(182, 51, 51);
+        color: white;
+        text-transform: uppercase;
+        font-weight: 900;
+        padding: 12px 35px 12px 35px;
         border-radius: 99px;
-        border: 1px solid black;
-        -webkit-box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
-        -moz-box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
-        box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 1);
         position: fixed;
-        width: 50%;
+        width: 80%;
+        letter-spacing: 5px;
         bottom: 50px;
         left: 50%;
         transform: translateX(-50%);
@@ -170,9 +187,9 @@ export default defineComponent({
         font-family: Helvetica;
         font-size: 24px;
         text-align: center;
-        color: black;
         text-decoration: none;
         z-index: 999;
+        border: none !important;
       }
     }
   }

@@ -3,7 +3,7 @@
     <img :src="`/images/profile_pictures/${profilePicture}`" alt="Profile Picture" />
     <div class="name">
       <p>{{ displayName }}</p>
-      <p>{{ realName }}</p>
+      <p>{{ realName }}</p>zz
     </div>
   </div>
 </template>
