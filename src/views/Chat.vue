@@ -321,7 +321,7 @@ export default defineComponent({
     },
     fetchVoiceMessage(prepVoice: string) {
       return new Promise((resolve, reject) => {
-        const url = 'https://api.elevenlabs.io/v1/text-to-speech/4lnyefdHNMhcN6l8aob8';
+        const url = 'https://api.elevenlabs.io/v1/text-to-speech/Q5DQYbkqnIsFbEUJYmGK';
         const data = {
           voice_settings: {
             style: 1,

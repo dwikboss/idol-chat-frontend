@@ -6,7 +6,37 @@
     <div v-if="chat.role === 'assistant'" class="message-content">
       <div class="message-bubble" :class="[chat.role, audio]">
         <p v-if="!chat.voice">{{ formatMessage }}</p>
-        <audio v-if="chat.voice" controls :src="chat.voice"></audio>
+        <div v-if="chat.voice" class="voice-message-player">
+          <div class="voice-controls">
+            <button 
+              @click="togglePlay" 
+              class="play-button"
+              :class="{ playing: isPlaying }"
+            >
+              <svg v-if="!isPlaying" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+              </svg>
+              <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 4H10V20H6V4Z" fill="currentColor"/>
+                <path d="M14 4H18V20H14V4Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="voice-info">
+              <div class="progress-container">
+                <div class="progress-bar">
+                  <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+                </div>
+                <div class="time-display">
+                  <span class="current-time">{{ formatTime(currentTime) }}</span>
+                  <span class="duration">{{ formatTime(duration) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="voice-waveform">
+            <div class="wave-bar" v-for="i in 20" :key="i" :style="{ height: getWaveHeight(i) + '%' }"></div>
+          </div>
+        </div>
         <img v-if="chat.media" :src="`/images/minji_pics/${chat.media}`" alt="pic_minji" />
       </div>
       <div v-if="!chat.voice && chat.role === 'assistant'" class="action-buttons">
@@ -30,7 +60,37 @@
     </div>
     <div v-else class="message-bubble" :class="[chat.role, audio]">
       <p v-if="!chat.voice">{{ formatMessage }}</p>
-      <audio v-if="chat.voice" controls :src="chat.voice"></audio>
+      <div v-if="chat.voice" class="voice-message-player">
+        <div class="voice-controls">
+          <button 
+            @click="togglePlay" 
+            class="play-button"
+            :class="{ playing: isPlaying }"
+          >
+            <svg v-if="!isPlaying" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+            </svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 4H10V20H6V4Z" fill="currentColor"/>
+              <path d="M14 4H18V20H14V4Z" fill="currentColor"/>
+            </svg>
+          </button>
+          <div class="voice-info">
+            <div class="progress-container">
+              <div class="progress-bar">
+                <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+              </div>
+              <div class="time-display">
+                <span class="current-time">{{ formatTime(currentTime) }}</span>
+                <span class="duration">{{ formatTime(duration) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="voice-waveform">
+          <div class="wave-bar" v-for="i in 20" :key="i" :style="{ height: getWaveHeight(i) + '%' }"></div>
+        </div>
+      </div>
       <img v-if="chat.media" :src="`/images/minji_pics/${chat.media}`" alt="pic_minji" />
     </div>
   </div>
@@ -46,6 +106,10 @@ export default defineComponent({
     return {
       translated: false as boolean,
       copied: false as boolean,
+      isPlaying: false as boolean,
+      currentTime: 0 as number,
+      duration: 0 as number,
+      audioElement: null as HTMLAudioElement | null,
     };
   },
   props: {
@@ -79,8 +143,67 @@ export default defineComponent({
     copyButtonText(): string {
       return this.copied;
     },
+    progressPercent(): number {
+      if (this.duration === 0) return 0;
+      return (this.currentTime / this.duration) * 100;
+    },
+  },
+  mounted() {
+    if (this.chat.voice) {
+      this.initAudio();
+    }
+  },
+  beforeUnmount() {
+    if (this.audioElement) {
+      this.audioElement.pause();
+      this.audioElement.removeEventListener('timeupdate', this.updateTime);
+      this.audioElement.removeEventListener('loadedmetadata', this.updateDuration);
+      this.audioElement.removeEventListener('ended', this.onEnded);
+    }
   },
   methods: {
+    initAudio() {
+      this.audioElement = new Audio(this.chat.voice);
+      this.audioElement.addEventListener('timeupdate', this.updateTime);
+      this.audioElement.addEventListener('loadedmetadata', this.updateDuration);
+      this.audioElement.addEventListener('ended', this.onEnded);
+    },
+    togglePlay() {
+      if (!this.audioElement) return;
+      
+      if (this.isPlaying) {
+        this.audioElement.pause();
+      } else {
+        this.audioElement.play();
+      }
+      this.isPlaying = !this.isPlaying;
+    },
+    updateTime() {
+      if (this.audioElement) {
+        this.currentTime = this.audioElement.currentTime;
+      }
+    },
+    updateDuration() {
+      if (this.audioElement) {
+        this.duration = this.audioElement.duration;
+      }
+    },
+    onEnded() {
+      this.isPlaying = false;
+      this.currentTime = 0;
+    },
+    formatTime(seconds: number): string {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    },
+    getWaveHeight(index: number): number {
+      // Create a realistic waveform pattern
+      const baseHeight = 30;
+      const variation = Math.sin(index * 0.5) * 20;
+      const random = Math.random() * 10;
+      return Math.max(10, baseHeight + variation + random);
+    },
     translate() {
       this.translated = !this.translated;
     },
@@ -293,18 +416,129 @@ export default defineComponent({
   }
 }
 
-audio {
+.voice-message-player {
   width: 100%;
   margin-top: 8px;
-  
-  &::-webkit-media-controls-panel {
-    background-color: #f9fafb;
-    border-radius: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .voice-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .play-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      flex-shrink: 0;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+      }
+
+      &.playing {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+
+        &:hover {
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+      }
+
+      svg {
+        transition: transform 0.2s ease;
+      }
+
+      &:hover svg {
+        transform: scale(1.1);
+      }
+    }
+
+    .voice-info {
+      flex-grow: 1;
+      min-width: 0;
+
+      .progress-container {
+        .progress-bar {
+          width: 100%;
+          height: 4px;
+          background: #e5e7eb;
+          border-radius: 2px;
+          overflow: hidden;
+          margin-bottom: 6px;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: width 0.1s ease;
+          }
+        }
+
+        .time-display {
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          color: #6b7280;
+          font-weight: 500;
+
+          .current-time {
+            color: #667eea;
+            font-weight: 600;
+          }
+
+          .duration {
+            color: #9ca3af;
+          }
+        }
+      }
+    }
   }
-  
-  &::-webkit-media-controls-play-button {
-    background-color: #667eea;
-    border-radius: 50%;
+
+  .voice-waveform {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 40px;
+    padding: 8px 0;
+
+    .wave-bar {
+      flex: 1;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      border-radius: 1px;
+      min-height: 4px;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+
+      &:nth-child(odd) {
+        background: linear-gradient(180deg, #764ba2 0%, #667eea 100%);
+      }
+
+      &:hover {
+        opacity: 1;
+        transform: scaleY(1.1);
+      }
+    }
   }
 }
 
@@ -328,6 +562,36 @@ audio {
     img {
       width: 28px;
       height: 28px;
+    }
+  }
+
+  .voice-message-player {
+    padding: 12px;
+
+    .voice-controls {
+      gap: 8px;
+
+      .play-button {
+        width: 36px;
+        height: 36px;
+      }
+
+      .voice-info {
+        .progress-container {
+          .time-display {
+            font-size: 11px;
+          }
+        }
+      }
+    }
+
+    .voice-waveform {
+      height: 32px;
+      gap: 1px;
+
+      .wave-bar {
+        min-height: 3px;
+      }
     }
   }
 }
