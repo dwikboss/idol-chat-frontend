@@ -141,7 +141,7 @@ export default defineComponent({
       }
     },
     copyButtonText(): string {
-      return this.copied;
+      return this.copied ? 'Copied!' : 'Copy';
     },
     progressPercent(): number {
       if (this.duration === 0) return 0;
