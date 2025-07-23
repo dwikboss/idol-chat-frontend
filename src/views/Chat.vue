@@ -262,7 +262,7 @@ export default defineComponent({
 
       const makeRequest = async () => {
         try {
-          const response = await axios.post('http://localhost:3000/message', {
+          const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
             chatHistory: this.chatHistory,
           });
 
