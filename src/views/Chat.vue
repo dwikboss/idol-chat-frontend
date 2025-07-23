@@ -62,7 +62,7 @@
           style="display: none;"
           @change="onImageSelected"
         />
-        <button @click="$refs.imageInput.click()" title="Upload Image">
+        <button @click="($refs.imageInput as HTMLInputElement).click()" title="Upload Image">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <rect x="4" y="16" width="16" height="4" rx="2" stroke="currentColor" stroke-width="2"/>
