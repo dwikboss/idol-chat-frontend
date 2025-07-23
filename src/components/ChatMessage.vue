@@ -128,7 +128,7 @@ export default defineComponent({
     },
     formatMessage() {
       if (this.chat.role === 'assistant') {
-        return this.translated ? this.chat.content.Korean : this.chat.content.Indonesian;
+        return this.translated ? this.chat.content.Dutch : this.chat.content.Indonesian;
       } else {
         return this.chat.content;
       }

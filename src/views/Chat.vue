@@ -54,6 +54,20 @@
           v-model="input"
           ref="inputField"
         />
+        <!-- Image upload button and hidden file input -->
+        <input
+          type="file"
+          accept="image/*"
+          ref="imageInput"
+          style="display: none;"
+          @change="onImageSelected"
+        />
+        <button @click="$refs.imageInput.click()" title="Upload Image">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="4" y="16" width="16" height="4" rx="2" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </button>
         <button @click="sendChat('')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -216,11 +230,11 @@ export default defineComponent({
           if (this.voiceMessages == 0) {
             inputConstr =
               this.input +
-              " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN Indonesian. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE Indonesian AND KOREAN TRANSLATIONS CAN BE THE SAME: {'Indonesian': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}] THIS IS THE FIRST VOICE MESSAGE, SO INCLUDE IN THE VOICE MESSAGE THAT YOURE BUSY OR DOING SOMETHING OR WALKING OR WHATEVER TO LET THE USER KNOW THAT WHY YOURE SENDING A VOICE MESSAGE";
+              " -- [WARNING! THIS USER HAS TRIGGERED A VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN Indonesian. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE Indonesian AND DUTCH TRANSLATIONS CAN BE THE SAME: {'Indonesian': '<VOICE MESSAGE REPLY>', 'Dutch': '<SAME VOICE MESSAGE REPLY>'}] THIS IS THE FIRST VOICE MESSAGE, SO INCLUDE IN THE VOICE MESSAGE THAT YOURE BUSY OR DOING SOMETHING OR WALKING OR WHATEVER TO LET THE USER KNOW THAT WHY YOURE SENDING A VOICE MESSAGE";
           } else {
             inputConstr =
               this.input +
-              " -- [WARNING! THIS USER HAS TRIGGERED ANOTHER VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN Indonesian. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE Indonesian AND KOREAN TRANSLATIONS CAN BE THE SAME: {'Indonesian': '<VOICE MESSAGE REPLY>', 'Korean': '<SAME VOICE MESSAGE REPLY>'}]";
+              " -- [WARNING! THIS USER HAS TRIGGERED ANOTHER VOICE MESSAGE REPLY. REPLY TO THIS USER AS IF YOU'RE SENDING IT THROUGH A VOICE MESSAGE, REPLY IN Indonesian. REPLY TO THE USER'S QUERY BUT IN A VOICE MESSAGE MANNER. ALSO ADHERE TO THE SAME JSON STRUCTURE LIKE BEFORE BUT THIS TIME THE Indonesian AND DUTCH TRANSLATIONS CAN BE THE SAME: {'Indonesian': '<VOICE MESSAGE REPLY>', 'Dutch': '<SAME VOICE MESSAGE REPLY>'}]";
           }
 
           const newVoiceMessage = { role: 'user', content: inputConstr };
@@ -248,7 +262,7 @@ export default defineComponent({
 
       const makeRequest = async () => {
         try {
-          const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
+          const response = await axios.post('http://localhost:3000/message', {
             chatHistory: this.chatHistory,
           });
 
@@ -358,6 +372,66 @@ export default defineComponent({
             reject(error);
           });
       });
+    },
+    /**
+     * Handle image file selection from the upload button
+     */
+    onImageSelected(event: Event) {
+      const input = event.target as HTMLInputElement;
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        // Upload the image to the backend and get an external URL
+        const formData = new FormData();
+        formData.append('image', file);
+        // Placeholder: Replace with your backend upload endpoint
+        axios.post('http://localhost:3000/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+          .then(async response => {
+            const imageUrl = response.data.url; // The backend should return a public URL
+            // Add a multi-modal message to the chat referencing the image URL (correct format)
+            const imageMessage = {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'What do you see in this image?'
+                },
+                {
+                  type: 'image_url',
+                  image_url: { url: imageUrl }
+                }
+              ]
+            };
+            this.chatHistory.push(imageMessage);
+            this.chatMessages.push(imageMessage);
+            this.scrollToEnd();
+            localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+            localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
+
+            // Immediately send the image message to the backend for AI description
+            this.loading = true;
+            try {
+              const response = await axios.post('http://localhost:3000/message', {
+                chatHistory: this.chatHistory,
+              });
+              const minjiReply = response.data.reply.choices[0].message.content;
+              this.chatHistory.push({ role: 'assistant', content: minjiReply });
+              this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
+              localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+              localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
+              this.scrollToEnd();
+            } catch (error) {
+              console.error('Error sending image to AI:', error);
+            } finally {
+              this.loading = false;
+            }
+          })
+          .catch(error => {
+            console.error('Image upload failed:', error);
+            alert('Image upload failed. Please try again.');
+          });
+      }
     },
   },
 });
