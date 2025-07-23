@@ -383,7 +383,7 @@ export default defineComponent({
         // Upload the image to the backend and get an external URL
         const formData = new FormData();
         formData.append('image', file);
-        axios.post('http://localhost:3000/upload', formData, {
+        axios.post('https://idol-chat-backend.vercel.app/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
           .then(async response => {
