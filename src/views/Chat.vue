@@ -378,12 +378,11 @@ export default defineComponent({
      */
     onImageSelected(event: Event) {
       const input = event.target as HTMLInputElement;
-      if (input.files && input.files[0]) {
+      if (input && input.files && input.files[0]) {
         const file = input.files[0];
         // Upload the image to the backend and get an external URL
         const formData = new FormData();
         formData.append('image', file);
-        // Placeholder: Replace with your backend upload endpoint
         axios.post('http://localhost:3000/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
@@ -402,7 +401,7 @@ export default defineComponent({
                   image_url: { url: imageUrl }
                 }
               ]
-            };
+            } as Message;
             this.chatHistory.push(imageMessage);
             this.chatMessages.push(imageMessage);
             this.scrollToEnd();
@@ -412,12 +411,12 @@ export default defineComponent({
             // Immediately send the image message to the backend for AI description
             this.loading = true;
             try {
-              const response = await axios.post('http://localhost:3000/message', {
+              const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
                 chatHistory: this.chatHistory,
               });
               const minjiReply = response.data.reply.choices[0].message.content;
-              this.chatHistory.push({ role: 'assistant', content: minjiReply });
-              this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) });
+              this.chatHistory.push({ role: 'assistant', content: minjiReply } as Message);
+              this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) } as Message);
               localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
               localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
               this.scrollToEnd();
