@@ -400,7 +400,7 @@ export default defineComponent({
 
         // 🔄 Send image to your backend's proxy upload endpoint
         axios
-          .post('https://idol-chat-backend.vercel.app/proxy-upload', formData, {
+          .post('https://idol-chat-backend-production.up.railway.app/proxy-upload', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           })
           .then(async (response) => {
