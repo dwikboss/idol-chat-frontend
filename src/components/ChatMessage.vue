@@ -5,7 +5,15 @@
     </div>
     <div v-if="chat.role === 'assistant'" class="message-content">
       <div class="message-bubble" :class="[chat.role, audio]">
-        <p v-if="!chat.voice">{{ formatMessage }}</p>
+        <!-- Render multi-modal content -->
+        <template v-if="Array.isArray(chat.content)">
+          <template v-for="(part, idx) in chat.content" :key="idx">
+            <span v-if="part.type === 'text'">{{ part.text }}</span>
+            <img v-else-if="part.type === 'image_url' && part.image_url && part.image_url.url" :src="part.image_url.url" alt="uploaded image" style="max-width: 100%; margin-top: 8px; border-radius: 8px;" />
+          </template>
+        </template>
+        <!-- Fallback for legacy string content -->
+        <p v-else-if="!chat.voice">{{ formatMessage }}</p>
         <div v-if="chat.voice" class="voice-message-player">
           <div class="voice-controls">
             <button 
@@ -59,7 +67,13 @@
       </div>
     </div>
     <div v-else class="message-bubble" :class="[chat.role, audio]">
-      <p v-if="!chat.voice">{{ formatMessage }}</p>
+      <!-- Render multi-modal content for user messages as well -->
+      <template v-if="Array.isArray(chat.content)">
+        <template v-for="(part, idx) in chat.content" :key="idx">
+          <img v-if="part.type === 'image_url' && part.image_url && part.image_url.url" :src="part.image_url.url" alt="uploaded image" style="max-width: 100%; margin-top: 8px; border-radius: 8px;" />
+        </template>
+      </template>
+      <p v-else-if="!chat.voice">{{ formatMessage }}</p>
       <div v-if="chat.voice" class="voice-message-player">
         <div class="voice-controls">
           <button 
@@ -417,13 +431,17 @@ export default defineComponent({
 }
 
 .voice-message-player {
-  width: 100%;
+  width: 60vw;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
   margin-top: 8px;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 
   .voice-controls {
     display: flex;

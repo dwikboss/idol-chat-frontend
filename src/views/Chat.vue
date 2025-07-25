@@ -26,7 +26,13 @@
       <div class="full-width">
         <div class="back-btn" @click="back">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M19 12H5M12 19L5 12L12 5"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </div>
         <img src="/images/profile_pictures/yuni-sharapfp.jpg" alt="Profile Picture" />
@@ -55,23 +61,35 @@
           ref="inputField"
         />
         <!-- Image upload button and hidden file input -->
-        <input
-          type="file"
-          accept="image/*"
-          ref="imageInput"
-          style="display: none;"
-          @change="onImageSelected"
-        />
+        <input type="file" accept="image/*" ref="imageInput" style="display: none" @change="onImageSelected" />
         <button @click="($refs.imageInput as HTMLInputElement).click()" title="Upload Image">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="4" y="16" width="16" height="4" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path
+              d="M12 16V4M12 4L8 8M12 4L16 8"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <rect x="4" y="16" width="16" height="4" rx="2" stroke="currentColor" stroke-width="2" />
           </svg>
         </button>
         <button @click="sendChat('')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M22 2L11 13"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M22 2L15 22L11 13L2 9L22 2Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
       </div>
@@ -134,8 +152,8 @@ export default defineComponent({
   },
   computed: {
     typeMessage() {
-      return this.voiceEvent ? 'Recording voice message...' : 'Typing...'
-    }
+      return this.voiceEvent ? 'Recording voice message...' : 'Typing...';
+    },
   },
   methods: {
     getRandomImage() {
@@ -373,61 +391,65 @@ export default defineComponent({
           });
       });
     },
-    /**
-     * Handle image file selection from the upload button
-     */
-    onImageSelected(event: Event) {
+    async onImageSelected(event: Event) {
       const input = event.target as HTMLInputElement;
       if (input && input.files && input.files[0]) {
         const file = input.files[0];
-        // Upload the image to the backend and get an external URL
         const formData = new FormData();
         formData.append('image', file);
-        axios.post('https://idol-chat-backend.vercel.app/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-          .then(async response => {
-            const imageUrl = response.data.url; // The backend should return a public URL
-            // Add a multi-modal message to the chat referencing the image URL (correct format)
+
+        // 🔄 Send image to your backend's proxy upload endpoint
+        axios
+          .post('http://localhost:3000/proxy-upload', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          })
+          .then(async (response) => {
+            const imageUrl = response.data.url;
+
+            // Format OpenAI-compatible vision message
             const imageMessage = {
               role: 'user',
               content: [
                 {
                   type: 'text',
-                  text: 'What do you see in this image?'
+                  text: 'What do you see in this image?',
                 },
                 {
                   type: 'image_url',
-                  image_url: { url: imageUrl }
-                }
-              ]
+                  image_url: { url: imageUrl },
+                },
+              ],
             } as Message;
+
             this.chatHistory.push(imageMessage);
             this.chatMessages.push(imageMessage);
             this.scrollToEnd();
+
             localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
             localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
 
-            // Immediately send the image message to the backend for AI description
+            // Send to OpenAI backend
             this.loading = true;
             try {
-              const response = await axios.post('https://idol-chat-backend.vercel.app/message', {
+              const aiResponse = await axios.post('https://idol-chat-backend.vercel.app/message', {
                 chatHistory: this.chatHistory,
               });
-              const minjiReply = response.data.reply.choices[0].message.content;
+              const minjiReply = aiResponse.data.reply.choices[0].message.content;
+
               this.chatHistory.push({ role: 'assistant', content: minjiReply } as Message);
               this.chatMessages.push({ role: 'assistant', content: JSON.parse(minjiReply) } as Message);
+
               localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
               localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
               this.scrollToEnd();
-            } catch (error) {
-              console.error('Error sending image to AI:', error);
+            } catch (err) {
+              console.error('Error sending image to AI:', err);
             } finally {
               this.loading = false;
             }
           })
-          .catch(error => {
-            console.error('Image upload failed:', error);
+          .catch((err) => {
+            console.error('Image upload failed:', err);
             alert('Image upload failed. Please try again.');
           });
       }
@@ -464,7 +486,6 @@ export default defineComponent({
     border: 1px solid black;
     font-size: 16px;
   }
-
 }
 
 .page.chat {
@@ -523,14 +544,14 @@ export default defineComponent({
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         font-size: 18px;
         font-weight: 500;
-        
+
         &:hover {
           background: #f9fafb;
           border-color: #d1d5db;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
           transform: translateY(-1px);
         }
-        
+
         &:active {
           transform: translateY(0);
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -610,21 +631,21 @@ export default defineComponent({
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         &:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
+
         &:active {
           transform: translateY(0);
           box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
         }
-        
+
         svg {
           transition: transform 0.2s ease;
         }
-        
+
         &:hover svg {
           transform: scale(1.1);
         }
