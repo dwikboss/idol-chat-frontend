@@ -70,6 +70,42 @@
         </div>
       </div>
     </div>
+    <div v-if="currentSong" class="music-status-bar">
+      <div class="music-status-content">
+        <div class="music-info">
+          <span class="music-status-title">🎵 {{ currentSong.replace(/\.mp3$/, '') }}</span>
+        </div>
+        <div class="custom-audio-player">
+          <button class="play-pause-btn" @click="togglePlayPause" :class="{ playing: isPlaying }">
+            <svg v-if="!isPlaying" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5v14l11-7z" fill="currentColor"/>
+            </svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" fill="currentColor"/>
+            </svg>
+          </button>
+          <div class="progress-container">
+            <div class="progress-bar" @click="seekToPosition">
+              <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+            </div>
+            <div class="time-display">
+              <span class="current-time">{{ formatTime(currentTime) }}</span>
+              <span class="total-time">{{ formatTime(duration) }}</span>
+            </div>
+          </div>
+        </div>
+        <button class="close-music-btn" @click="stopMusic" title="Stop music">✖</button>
+      </div>
+      <audio 
+        ref="audioPlayer" 
+        :src="`/songs/${currentSong}`" 
+        @loadedmetadata="onAudioLoaded"
+        @timeupdate="onTimeUpdate"
+        @ended="onAudioEnded"
+        @play="isPlaying = true"
+        @pause="isPlaying = false"
+      ></audio>
+    </div>
     <div class="chat-container full-width" ref="chatContainer">
       <ChatMessage v-for="(chat, index) in chatMessages" :key="index" :chat="chat" :idol="idolData" />
     </div>
@@ -164,6 +200,11 @@ export default defineComponent({
         'Yuni Shara - Mengapa Tiada Maaf [Official Music Video].mp3',
         'Yuni Shara - Tuhan Jagakan Dia (Official Music Video).mp3',
       ],
+      currentSong: null as string | null, // <-- add this
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
+      progressPercent: 0,
     };
   },
   mounted() {
@@ -484,20 +525,61 @@ export default defineComponent({
       }
     },
     selectSong(song: string) {
-      // Add an assistant message with the song (audio player)
-      const songMessage = {
-        role: 'assistant',
-        content: [
-          { type: 'text', text: `🎵 ${song.replace(/\.mp3$/, '')}` },
-          { type: 'audio', audio_url: { url: `/songs/${song}` } }
-        ]
-      } as Message;
-      this.chatHistory.push(songMessage);
-      this.chatMessages.push(songMessage);
-      this.scrollToEnd();
-      localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
-      localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
+      this.currentSong = song;
       this.showMusicPopup = false;
+    },
+    togglePlayPause() {
+      const audio = this.$refs.audioPlayer as HTMLAudioElement;
+      if (audio) {
+        if (audio.paused) {
+          audio.play();
+        } else {
+          audio.pause();
+        }
+      }
+    },
+    seekToPosition(event: MouseEvent) {
+      const progressBar = event.currentTarget as HTMLElement;
+      const audio = this.$refs.audioPlayer as HTMLAudioElement;
+      if (audio) {
+        const rect = progressBar.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const progress = (clickX / rect.width) * 100;
+        audio.currentTime = (progress / 100) * audio.duration;
+      }
+    },
+    onAudioLoaded() {
+      const audio = this.$refs.audioPlayer as HTMLAudioElement;
+      if (audio) {
+        this.duration = audio.duration;
+      }
+    },
+    onTimeUpdate() {
+      const audio = this.$refs.audioPlayer as HTMLAudioElement;
+      if (audio) {
+        this.currentTime = audio.currentTime;
+        this.progressPercent = (audio.currentTime / audio.duration) * 100;
+      }
+    },
+    onAudioEnded() {
+      this.isPlaying = false;
+      this.progressPercent = 0;
+      this.currentTime = 0;
+    },
+    formatTime(seconds: number) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    },
+    stopMusic() {
+      const audio = this.$refs.audioPlayer as HTMLAudioElement;
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+        this.isPlaying = false;
+        this.progressPercent = 0;
+        this.currentTime = 0;
+      }
     },
   },
 });
@@ -629,6 +711,154 @@ export default defineComponent({
         border-radius: 50%;
         border: 1px solid black;
       }
+    }
+  }
+
+  .music-status-bar {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 997;
+    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .music-status-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+  }
+
+  .music-info {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .music-status-title {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
+    animation: scroll-text 8s linear infinite;
+    padding-right: 50px; /* Add space for the text to scroll into */
+  }
+
+  @keyframes scroll-text {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(calc(-100% + 200px)); }
+    100% { transform: translateX(0); }
+  }
+
+  .custom-audio-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .play-pause-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    &.playing {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffffff 0%, #f3f4f6 100%);
+    border-radius: 3px;
+    transition: width 0.1s ease;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  .close-music-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
     }
   }
 
