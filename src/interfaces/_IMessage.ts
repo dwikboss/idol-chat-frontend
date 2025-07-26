@@ -3,6 +3,7 @@ export default interface Message {
   content: string | Array<
     | { type: 'text'; text: string }
     | { type: 'image_url'; image_url: { url: string } }
+    | { type: 'audio'; audio_url: { url: string } }
   >;
   content_KR?: string;
   media?: string;

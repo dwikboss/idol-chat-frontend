@@ -483,7 +483,7 @@ export default defineComponent({
           });
       }
     },
-    selectSong(song) {
+    selectSong(song: string) {
       // Add an assistant message with the song (audio player)
       const songMessage = {
         role: 'assistant',
@@ -491,7 +491,7 @@ export default defineComponent({
           { type: 'text', text: `🎵 ${song.replace(/\.mp3$/, '')}` },
           { type: 'audio', audio_url: { url: `/songs/${song}` } }
         ]
-      };
+      } as Message;
       this.chatHistory.push(songMessage);
       this.chatMessages.push(songMessage);
       this.scrollToEnd();
