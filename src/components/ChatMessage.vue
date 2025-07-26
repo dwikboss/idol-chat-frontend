@@ -10,6 +10,9 @@
           <template v-for="(part, idx) in chat.content" :key="idx">
             <span v-if="part.type === 'text'">{{ part.text }}</span>
             <img v-else-if="part.type === 'image_url' && part.image_url && part.image_url.url" :src="part.image_url.url" alt="uploaded image" style="max-width: 100%; margin-top: 8px; border-radius: 8px;" />
+            <div v-else-if="part.type === 'audio' && part.audio_url && part.audio_url.url" class="voice-message-player audio-message-player">
+              <audio :src="part.audio_url.url" controls style="width: 100%; outline: none; background: transparent; border-radius: 8px;"></audio>
+            </div>
           </template>
         </template>
         <!-- Fallback for legacy string content -->
@@ -71,6 +74,9 @@
       <template v-if="Array.isArray(chat.content)">
         <template v-for="(part, idx) in chat.content" :key="idx">
           <img v-if="part.type === 'image_url' && part.image_url && part.image_url.url" :src="part.image_url.url" alt="uploaded image" style="max-width: 100%; margin-top: 8px; border-radius: 8px;" />
+          <div v-else-if="part.type === 'audio' && part.audio_url && part.audio_url.url" class="voice-message-player audio-message-player">
+            <audio :src="part.audio_url.url" controls style="width: 100%; outline: none; background: transparent; border-radius: 8px;"></audio>
+          </div>
         </template>
       </template>
       <p v-else-if="!chat.voice">{{ formatMessage }}</p>
@@ -390,15 +396,15 @@ export default defineComponent({
     }
 
     &.user {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
       color: white;
       border-radius: 18px 18px 4px 18px;
       margin-left: auto;
       max-width: 75%;
-      box-shadow: 0 1px 3px rgba(102, 126, 234, 0.15);
+      box-shadow: 0 1px 3px rgba(220, 38, 38, 0.15);
       
       &:hover {
-        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
         transform: translateY(-1px);
       }
       
@@ -454,24 +460,24 @@ export default defineComponent({
       height: 40px;
       border-radius: 50%;
       border: none;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
       color: white;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
       flex-shrink: 0;
 
       &:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
       }
 
       &:active {
         transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
       }
 
       &.playing {
@@ -558,6 +564,21 @@ export default defineComponent({
       }
     }
   }
+}
+
+.audio-message-player {
+  margin-top: 8px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  width: 60vw;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 // Responsive design

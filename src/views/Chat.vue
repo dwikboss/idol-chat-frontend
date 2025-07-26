@@ -41,10 +41,32 @@
           <p v-if="loading">{{ typeMessage }}</p>
           <p v-else>Online</p>
         </div>
-        <div class="settings-btn" @click="openSettings">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
+        <!-- Wrap music and settings buttons in a right-aligned flex container -->
+        <div class="header-actions">
+          <button class="music-btn styled-header-btn" @click="showMusicPopup = true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 17V5l12-2v12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6" cy="18" r="3" stroke="white" stroke-width="2"/>
+              <circle cx="18" cy="16" r="3" stroke="white" stroke-width="2"/>
+            </svg>
+          </button>
+          <div class="settings-btn" @click="openSettings">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+        <!-- Music popup -->
+        <div v-if="showMusicPopup" class="music-popup-overlay" @click="showMusicPopup = false">
+          <div class="music-popup" @click.stop>
+            <div class="music-popup-content">
+              <div class="song-list-popup">
+                <button v-for="song in songs" :key="song" class="song-btn" @click="selectSong(song)">
+                  <span class="song-title">{{ song.replace(/\.mp3$/, '') }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -134,6 +156,13 @@ export default defineComponent({
         'image5.jpg',
         'image6.jpg',
         'image7.jpg',
+      ],
+      showMusicPopup: false,
+      songs: [
+        'Yuni Shara - Maafkan (Official Lyric Video).mp3',
+        'Yuni Shara - Singkong & Keju (Official Music Video).mp3',
+        'Yuni Shara - Mengapa Tiada Maaf [Official Music Video].mp3',
+        'Yuni Shara - Tuhan Jagakan Dia (Official Music Video).mp3',
       ],
     };
   },
@@ -454,6 +483,22 @@ export default defineComponent({
           });
       }
     },
+    selectSong(song) {
+      // Add an assistant message with the song (audio player)
+      const songMessage = {
+        role: 'assistant',
+        content: [
+          { type: 'text', text: `🎵 ${song.replace(/\.mp3$/, '')}` },
+          { type: 'audio', audio_url: { url: `/songs/${song}` } }
+        ]
+      };
+      this.chatHistory.push(songMessage);
+      this.chatMessages.push(songMessage);
+      this.scrollToEnd();
+      localStorage.setItem('chatHistory', JSON.stringify(this.chatHistory));
+      localStorage.setItem('chatHistoryDisplay', JSON.stringify(this.chatMessages));
+      this.showMusicPopup = false;
+    },
   },
 });
 </script>
@@ -512,8 +557,16 @@ export default defineComponent({
       display: flex;
       gap: 15px;
 
+      .header-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 25px;
+        margin-left: auto;
+      }
       .settings-btn {
-        flex-grow: 1;
+        /* Remove flex-grow and align right */
+        flex-grow: 0 !important;
         justify-content: center;
         display: flex;
         flex-direction: column;
@@ -621,25 +674,25 @@ export default defineComponent({
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         font-size: 14px;
         font-weight: 600;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
         color: white;
         border: none;
         border-radius: 50%;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
         display: flex;
         align-items: center;
         justify-content: center;
 
         &:hover {
           transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
 
         &:active {
           transform: translateY(0);
-          box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+          box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
         }
 
         svg {
@@ -676,5 +729,97 @@ export default defineComponent({
       }
     }
   }
+}
+.music-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.music-popup {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  z-index: 1001;
+  min-width: 300px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.music-popup-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.music-btn.styled-header-btn {
+  height: 38px;
+  width: 38px;
+  background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+  margin-right: 0;
+  padding: 0;
+}
+.music-btn.styled-header-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+.music-btn.styled-header-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+.music-btn.styled-header-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.music-btn.styled-header-btn:hover svg {
+  transform: scale(1.1);
+}
+.song-list-popup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.song-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #f87171 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  box-shadow: 0 1px 4px rgba(220, 38, 38, 0.08);
+  transform: scale(1);
+}
+.song-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
 }
 </style>
